@@ -7,7 +7,6 @@ use Slim\Factory\AppFactory;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 
 require __DIR__ . '/vendor/autoload.php';
-require_once './CustomHttpException/HttpNotAcceptable.php';
 
 //--Step 1) Instantiate App.
 $app = AppFactory::create();
@@ -46,7 +45,7 @@ $app->setBasePath("/tripplanner");
 
 // Define app routes.
 $app->get('/hello', function (Request $request, Response $response, $args) {
-    $response->getBody()->write("Hello!");
+    $response->getBody()->write(json_encode(["message" => "Hello, World!"]));
     return $response;
 });
 
