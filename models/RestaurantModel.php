@@ -51,7 +51,7 @@ class Restaurant extends BaseModel
     {
         $query = 'UPDATE restaurant SET';
         foreach ($restaurant as $key => $val) {
-            if ($key != 'id') {
+            if ($key != 'restaurant_id') {
                 $query .= " $key = :$key,";
             }
         }
