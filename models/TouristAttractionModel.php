@@ -1,5 +1,7 @@
 <?php
 
+namespace app\models;
+
 class TouristAttractionModel extends BaseModel {
 
     private $table_name = "attraction";

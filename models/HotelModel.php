@@ -1,5 +1,7 @@
 <?php
 
+namespace app\models; 
+
 class HotelModel extends BaseModel {
 
     private $table_name = "hotel";

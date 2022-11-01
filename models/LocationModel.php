@@ -1,5 +1,7 @@
 <?php
 
+namespace app\models;
+
 class LocationModel extends BaseModel {
 
     private $table_name = "location";
