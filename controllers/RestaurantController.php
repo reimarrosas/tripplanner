@@ -8,10 +8,12 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 use app\models\RestaurantModel;
 use Slim\Exception\HttpInternalServerErrorException;
+use Slim\Exception\HttpNotFoundException;
 
 class RestaurantController
 {
     // Route: /restaurants
+    // TODO: Pagination
     public function getRestaurants(Request $request, Response $response, array $args): Response
     {
         $query_params = $request->getQueryParams();
@@ -33,14 +35,21 @@ class RestaurantController
         if ($restaurant_id < 1) {
             throw new HttpUnprocessableEntity($request, 'Restaurant ID is not valid!');
         }
+
+        $result = [];
         try {
             $restaurant_model = new RestaurantModel();
             $result = $restaurant_model->getSingleRestaurant($restaurant_id);
-            $response->getBody()->write(json_encode($result));
-            return $response;
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
+
+        if (empty($result)) {
+            throw new HttpNotFoundException($request, "Restaurant with ID $restaurant_id not found!");
+        }
+
+        $response->getBody()->write(json_encode($result));
+        return $response;
     }
 
     // TODO: createRestaurant

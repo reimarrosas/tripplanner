@@ -284,7 +284,8 @@ class BaseModel
 
     protected function fetchSingle(string $sql, array $params = []): array
     {
-        return $this->preparedQuery($sql, $params)->fetch(PDO::FETCH_ASSOC);
+        $result = $this->preparedQuery($sql, $params)->fetch(PDO::FETCH_ASSOC);
+        return $result === false ? [] : $result;
     }
 
     protected function fetchAll(string $sql, array $params = []): array
