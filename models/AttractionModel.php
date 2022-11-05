@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-class TouristAttractionModel extends BaseModel {
+class AttractionModel extends BaseModel {
 
     private $table_name = "attraction";
 
@@ -19,7 +19,7 @@ class TouristAttractionModel extends BaseModel {
      * Retrieve all attraction from the `attraction` table.
      * @return array A list of attraction. 
      */
-    public function getAll() {
+    public function getAllAttractions() {
         $sql = "SELECT * FROM attraction";
         $data = $this->rows($sql);
         return $data;
@@ -30,7 +30,7 @@ class TouristAttractionModel extends BaseModel {
      * @param int $attractionId the id of the attraction.
      * @return array an array containing information about a given attraction.
      */
-    public function getAttractionById($attraction_id) {
+    public function getSingleAttraction($attraction_id) {
         $sql = "SELECT * FROM attraction WHERE attraction_id = ?";
         $data = $this->run($sql, [$attraction_id])->fetch();
         

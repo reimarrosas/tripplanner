@@ -19,7 +19,7 @@ class LocationModel extends BaseModel {
      * Retrieve all location from the `location` table.
      * @return array A list of location. 
      */
-    public function getAll() {
+    public function getAllLocations() {
         $sql = "SELECT * FROM location";
         $data = $this->rows($sql);
         return $data;
@@ -54,7 +54,7 @@ class LocationModel extends BaseModel {
      * @param int $locationId the id of the location.
      * @return array an array containing information about a given location.
      */
-    public function getLocationById($locationId) {
+    public function getSingleLocation($locationId) {
         $sql = "SELECT * FROM location WHERE location_id = ?";
         $data = $this->run($sql, [$locationId])->fetch();
         

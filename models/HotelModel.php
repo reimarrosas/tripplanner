@@ -19,7 +19,7 @@ class HotelModel extends BaseModel {
      * Retrieve all hotel from the `hotel` table.
      * @return array A list of hotel. 
      */
-    public function getAll() {
+    public function getAllHotels() {
         $sql = "SELECT * FROM hotel";
         $data = $this->rows($sql);
         return $data;
@@ -30,7 +30,7 @@ class HotelModel extends BaseModel {
      * @param int $hotelId the id of the location.
      * @return array an array containing information about a given hotel.
      */
-    public function getHotelById($hotelId) {
+    public function getSingleHotel($hotelId) {
         $sql = "SELECT * FROM hotel WHERE hotel_id = ?";
         $data = $this->run($sql, [$hotelId])->fetch();
         
@@ -40,12 +40,12 @@ class HotelModel extends BaseModel {
     /**
      * Update information about one or more location (the /hotels resource collection must support this operations).
      */
-    public function updateLocation($data, $where) {        
+    public function updateHotel($data, $where) {        
         $data = $this->update("hotel", $data, $where);
         return $data;      
     }
 
-    public function createLocation($data) {
+    public function createHotel($data) {
         $data = $this->insert("hotel", $data);
         
         return $data;
