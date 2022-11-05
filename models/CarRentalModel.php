@@ -15,7 +15,7 @@ class CarRentalModel extends BaseModel
     public function getAllCarRentals(): array
     {
         $query = 'SELECT * FROM car_rental';
-        return $this->fetchAll($query, $filters);
+        return $this->fetchAll($query);
     }
 
     // Getting a car rental by id
