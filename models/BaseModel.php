@@ -300,10 +300,10 @@ class BaseModel
 
     protected function paramType($param)
     {
-        return match ($param) {
-            is_int($param) => PDO::PARAM_INT,
-            is_bool($param) => PDO::PARAM_BOOL,
-            is_null($param) => PDO::PARAM_NULL,
+        return match (gettype($param)) {
+            "integer" => PDO::PARAM_INT,
+            "boolean" => PDO::PARAM_BOOL,
+            "NULL" => PDO::PARAM_NULL,
             default => PDO::PARAM_STR
         };
     }
