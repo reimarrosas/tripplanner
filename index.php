@@ -1,5 +1,6 @@
 <?php
 
+use app\controllers\RestaurantController;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 //var_dump($_SERVER["REQUEST_METHOD"]);
@@ -48,6 +49,12 @@ $app->get('/hello', function (Request $request, Response $response, $args) {
     $response->getBody()->write(json_encode(["message" => "Hello, World!"]));
     return $response;
 });
+
+// ROUTES
+// FORMAT: [{class_name}::class, '{method_name}']
+// Restaurants routes
+$app->get('/restaurants', [RestaurantController::class, 'getRestaurants']);
+$app->get('/restaurants/{restaurant_id}', [RestaurantController::class, 'getRestaurant']);
 
 // Run the app.
 $app->run();
