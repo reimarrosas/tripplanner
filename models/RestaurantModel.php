@@ -2,9 +2,7 @@
 
 namespace app\models;
 
-use Slim\Exception\HttpInternalServerErrorException;
-
-class Restaurant extends BaseModel
+class RestaurantModel extends BaseModel
 {
     public function __construct()
     {
@@ -15,7 +13,7 @@ class Restaurant extends BaseModel
     {
         $query = 'SELECT * FROM restaurant';
 
-        if (!empty($filter)) {
+        if (!empty($filters)) {
             $query .= ' WHERE';
             foreach ($filters as $key => $val) {
                 if ($key == 'name') {
@@ -26,7 +24,6 @@ class Restaurant extends BaseModel
             }
             $query = preg_replace('/ AND$/', '', $query);
         }
-
 
         return $this->fetchAll($query, $filters);
     }
