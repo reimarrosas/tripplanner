@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 24, 2022 at 04:09 PM
+-- Generation Time: Nov 07, 2022 at 04:20 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -34,22 +34,23 @@ CREATE TABLE `attraction` (
   `attraction_id` int(11) NOT NULL,
   `location_fk` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `price_range` enum('0.00-25.00','25.00-50.00','50.00-75.00','75.00-100.00') NOT NULL,
+  `price_min` decimal(5,2) NOT NULL,
   `parking` tinyint(1) NOT NULL,
   `charging_station` tinyint(1) NOT NULL,
-  `street` varchar(255) NOT NULL
+  `street` varchar(255) NOT NULL,
+  `price_max` decimal(5,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `attraction`
 --
 
-INSERT INTO `attraction` (`attraction_id`, `location_fk`, `name`, `price_range`, `parking`, `charging_station`, `street`) VALUES
-(1, 1, 'Old Port', '0.00-25.00', 0, 1, '333 De La Commune Street'),
-(2, 2, 'CN Tower', '50.00-75.00', 1, 1, '290 Bremner Street'),
-(3, 4, 'Parliament ', '0.00-25.00', 1, 0, '562 Wellington Street'),
-(4, 3, 'Museum of Vancouver', '25.00-50.00', 0, 0, '310 Granville Street'),
-(5, 5, 'Chutes Montmorency', '75.00-100.00', 0, 1, '5300 Sainte-Anne Street');
+INSERT INTO `attraction` (`attraction_id`, `location_fk`, `name`, `price_min`, `parking`, `charging_station`, `street`, `price_max`) VALUES
+(1, 1, 'Old Port', '0.00', 0, 1, '333 De La Commune Street', '25.00'),
+(2, 2, 'CN Tower', '50.00', 1, 1, '290 Bremner Street', '75.00'),
+(3, 4, 'Parliament ', '0.00', 1, 0, '562 Wellington Street', '25.00'),
+(4, 3, 'Museum of Vancouver', '25.00', 0, 0, '310 Granville Street', '50.00'),
+(5, 5, 'Chutes Montmorency', '75.00', 0, 1, '5300 Sainte-Anne Street', '100.00');
 
 -- --------------------------------------------------------
 
@@ -65,19 +66,20 @@ CREATE TABLE `car` (
   `passenger` int(255) NOT NULL,
   `year` int(255) NOT NULL,
   `type` enum('suv','luxury','sports','sedan') NOT NULL,
-  `car_rental_fk` int(11) NOT NULL
+  `car_rental_fk` int(11) NOT NULL,
+  `price` decimal(5,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `car`
 --
 
-INSERT INTO `car` (`car_id`, `make`, `model`, `passenger`, `year`, `type`, `car_rental_fk`) VALUES
-(1, 'Toyota', 'Yaris', 4, 2015, 'sedan', 1),
-(2, 'Honda', 'Civic', 4, 2015, 'sedan', 2),
-(3, 'Hyundai', 'Santa Fe', 5, 2016, 'suv', 1),
-(4, 'BMW', 'i8', 2, 2022, 'sports', 2),
-(5, 'Rolls-Royce', 'Ghost', 4, 2021, 'luxury', 1);
+INSERT INTO `car` (`car_id`, `make`, `model`, `passenger`, `year`, `type`, `car_rental_fk`, `price`) VALUES
+(1, 'Toyota', 'Yaris', 4, 2015, 'sedan', 1, '17.00'),
+(2, 'Honda', 'Civic', 4, 2015, 'sedan', 2, '18.00'),
+(3, 'Hyundai', 'Santa Fe', 5, 2016, 'suv', 1, '15.00'),
+(4, 'BMW', 'i8', 2, 2022, 'sports', 2, '25.00'),
+(5, 'Rolls-Royce', 'Ghost', 4, 2021, 'luxury', 1, '30.00');
 
 -- --------------------------------------------------------
 
@@ -89,21 +91,22 @@ DROP TABLE IF EXISTS `car_rental`;
 CREATE TABLE `car_rental` (
   `car_rental_id` int(11) NOT NULL,
   `location_fk` int(11) NOT NULL,
-  `price_range` enum('100.00-150.00','150.00-200.00','200.00-250.00','') NOT NULL,
+  `price_min` decimal(5,2) NOT NULL,
   `rental_duration` date NOT NULL,
-  `street` varchar(255) NOT NULL
+  `street` varchar(255) NOT NULL,
+  `price_max` decimal(5,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `car_rental`
 --
 
-INSERT INTO `car_rental` (`car_rental_id`, `location_fk`, `price_range`, `rental_duration`, `street`) VALUES
-(1, 1, '100.00-150.00', '2022-12-02', '2463 Saint-Kevin Street'),
-(2, 2, '150.00-200.00', '2023-01-16', '8264 St-Laurent Street'),
-(3, 3, '150.00-200.00', '2023-02-10', '2734 Saint-Marie Street'),
-(4, 4, '100.00-150.00', '2023-04-19', '3648 Victoria Street'),
-(5, 5, '150.00-200.00', '2023-10-23', '3967 Sherbrooke Street');
+INSERT INTO `car_rental` (`car_rental_id`, `location_fk`, `price_min`, `rental_duration`, `street`, `price_max`) VALUES
+(1, 1, '100.00', '2022-12-02', '2463 Saint-Kevin Street', '150.00'),
+(2, 2, '150.00', '2023-01-16', '8264 St-Laurent Street', '200.00'),
+(3, 3, '150.00', '2023-02-10', '2734 Saint-Marie Street', '200.00'),
+(4, 4, '100.00', '2023-04-19', '3648 Victoria Street', '150.00'),
+(5, 5, '150.00', '2023-10-23', '3967 Sherbrooke Street', '200.00');
 
 -- --------------------------------------------------------
 
@@ -144,20 +147,21 @@ CREATE TABLE `hotel` (
   `charging_station` tinyint(1) NOT NULL,
   `Street` varchar(255) NOT NULL,
   `location_fk` int(11) NOT NULL,
-  `price_range` enum('100.00-250.00','250.00-400.00','400.00-550.00','') NOT NULL,
-  `accessibility` enum('car','public','walking','') NOT NULL
+  `price_min` decimal(5,2) NOT NULL,
+  `accessibility` enum('car','public','walking','') NOT NULL,
+  `price_max` decimal(5,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `hotel`
 --
 
-INSERT INTO `hotel` (`hotel_id`, `name`, `charging_station`, `Street`, `location_fk`, `price_range`, `accessibility`) VALUES
-(1, 'The Ritz-Carlton ', 1, '2193 Saint-Denise Street', 1, '250.00-400.00', 'car'),
-(2, 'Hilton', 0, '2236 Crescent Street', 2, '100.00-250.00', 'car'),
-(3, 'Four Seasons', 0, '038 Saint-Martin Street', 3, '400.00-550.00', 'car'),
-(4, 'Sofitel', 0, '1936 Saint-Marie Street', 4, '250.00-400.00', 'car'),
-(5, 'Delta', 1, '2502 Maine Street', 5, '100.00-250.00', 'car');
+INSERT INTO `hotel` (`hotel_id`, `name`, `charging_station`, `Street`, `location_fk`, `price_min`, `accessibility`, `price_max`) VALUES
+(1, 'The Ritz-Carlton ', 1, '2193 Saint-Denise Street', 1, '250.00', 'car', '400.00'),
+(2, 'Hilton', 0, '2236 Crescent Street', 2, '100.00', 'car', '250.00'),
+(3, 'Four Seasons', 0, '038 Saint-Martin Street', 3, '400.00', 'car', '550.00'),
+(4, 'Sofitel', 0, '1936 Saint-Marie Street', 4, '250.00', 'car', '400.00'),
+(5, 'Delta', 1, '2502 Maine Street', 5, '100.00', 'car', '250.00');
 
 -- --------------------------------------------------------
 
@@ -194,22 +198,23 @@ CREATE TABLE `restaurant` (
   `restaurant_id` int(11) NOT NULL,
   `location_fk` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `price_range` enum('0.00-25.00','25.00-50.00','50.00+','') NOT NULL,
+  `price_min` decimal(5,2) NOT NULL,
   `accessibility` enum('car','public','walking','') NOT NULL,
   `charging_station` tinyint(1) NOT NULL,
-  `street` varchar(255) NOT NULL
+  `street` varchar(255) NOT NULL,
+  `price_max` decimal(5,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `restaurant`
 --
 
-INSERT INTO `restaurant` (`restaurant_id`, `location_fk`, `name`, `price_range`, `accessibility`, `charging_station`, `street`) VALUES
-(1, 1, 'Baton-Rouge', '50.00+', 'car', 1, '6373 Decarie Street'),
-(2, 2, 'Balthazar', '25.00-50.00', 'public', 0, '2946 Notre-Dame Street'),
-(3, 3, 'McDonald\'s', '0.00-25.00', 'walking', 0, '2749 Jarry Street'),
-(4, 4, 'KFC', '0.00-25.00', 'car', 1, '2047 Saint-Catherine Street'),
-(5, 5, 'Harvey\'s', '0.00-25.00', 'public', 0, '4065 Ontario Street');
+INSERT INTO `restaurant` (`restaurant_id`, `location_fk`, `name`, `price_min`, `accessibility`, `charging_station`, `street`, `price_max`) VALUES
+(1, 1, 'Baton-Rouge', '50.00', 'car', 1, '6373 Decarie Street', '75.00'),
+(2, 2, 'Balthazar', '45.00', 'public', 0, '2946 Notre-Dame Street', '60.00'),
+(3, 3, 'McDonald\'s', '1.00', 'walking', 0, '2749 Jarry Street', '15.00'),
+(4, 4, 'KFC', '4.00', 'car', 1, '2047 Saint-Catherine Street', '50.00'),
+(5, 5, 'Harvey\'s', '3.00', 'public', 0, '4065 Ontario Street', '22.00');
 
 -- --------------------------------------------------------
 
