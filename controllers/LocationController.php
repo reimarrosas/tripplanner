@@ -18,19 +18,19 @@ class LocationController
     {
         $query_params = $request->getQueryParams(); 
         $filters = $this->parseLocationFilters($query_params);
+        $result = Null;
         try {
             $location_model = new LocationModel();
-            if (isset($query_params["name"])) { //filters base on the name
+            if (isset($query_params["country"]) && isset($query_params["city"])) { //filters base on country and city
+                $result = $location_model->getWhereCityAndCountryLike($query_params["country"], $query_params["city"]);
+            }elseif (isset($query_params["city"])) { //filters based on city
+                $result = $location_model->getWhereCityLike($query_params["city"]);
+            }elseif (isset($query_params["country"])){ //filters based on country
                 $result = $location_model->getWhereCountryLike($query_params["country"]);
-                $response->getBody()->write(json_encode($result));
-            }
-            if (isset($query_params["city"])) { //filters based on the price range
-                $result = $hotel_model->getWhereCityLike($query_params["city"]);
-                $response->getBody()->write(json_encode($result));
             } else {
-                $result = $location_model->getAllLocations($filters); // gets all the hotels
-                $response->getBody()->write(json_encode($result));
+                $result = $location_model->getAllLocations($filters); // gets all the locations
             }
+            $response->getBody()->write(json_encode($result));
             return $response;
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
@@ -84,7 +84,79 @@ class LocationController
         $response->getBody()->write(json_encode($result));
         return $response;
     }
+
+    function updateLocation(Request $request, Response $response, array $args) {
+        $location_model = new LocationModel();
+        $data = $request->getParsedBody();
+        $arr = array(); // creating empty arrays
+    
+        for ($i = 0; $i < count($data); $i++) {
+            $single_location = $data[$i];
+            $location_id = $single_location["location_id"];
+            $country = $single_location["country"];
+            $city = $single_location["city"];
+            
+            /**if (isset($artist_id)) {
+                // This will check if the id exists in the table
+                $id = $artist_model->check($artist_id);
+                if ($id == null) {
+                    // If matches are found
+                    $response_data = makeCustomJSONError("resourceNotFound", "The Artist ID ".$artist_id." doesn't exist, please enter another id");
+                    $response->getBody()->write($response_data);
+                    return $response->withStatus(HTTP_NOT_FOUND);
+                }
+            }*/
+    
+            array_push($arr, "The resource for location id : ".$location_id. " has been modified");
+            echo"hello";
+            $location_model->updateLocation2($city, $country, $location_id);
+            echo"hello";
+        }
+    
+        $response_data = json_encode($arr);
+        $response->getBody()->write($response_data);
+        return $response;
+       // return $response;
+    }
    
+    function createLocation(Request $request, Response $response, array $args) {
+        $location_model = new LocationModel();
+        $parsed_data = $request->getParsedBody();
+        $arr = array(); // creating empty arrays
+       //var_dump($parsed_data); exit;
+        $data_string = "";
+        $location_id ="";
+        $country = "";
+        $city = "";
+
+        for ($i = 0; $i < count($parsed_data); $i++) {
+            $single_location = $parsed_data[$i];
+    
+            $location_id = $single_location["location_id"];
+            $country = $single_location["country"];
+            $city = $single_location["city"];
+            
+            /**if (isset($location_id)) {
+                // This will check if the id already exist in the table
+                $id = $artist_model->check($artist_id);
+                if ($id != null) {
+                    // If matches are found
+                    $response_data = makeCustomJSONError("resourceNotFound", "The Artist ID ".$artist_id." already exists, please enter another id");
+                    $response->getBody()->write($response_data);
+                    return $response->withStatus(HTTP_NOT_FOUND);
+                }
+            }*/
+    
+            $location_record = array("location_id" => $location_id, "country" => $country, "city" => $city);
+            array_push($arr, "Location id : ".$location_id. " is created");
+            $location_model->createLocation($location_record);
+        }
+        //$response->getBody()->write($artist_id.$artistName);
+        $response_data = json_encode($arr);
+        $response->getBody()->write($response_data);
+        return $response;
+    }
+    
     private function parseLocationFilters(array $query_params): array
     {
         $country = $query_params['country'] ?? false;

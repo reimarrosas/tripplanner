@@ -49,6 +49,18 @@ class LocationModel extends BaseModel {
         return $data;
     }
 
+     /**
+     * Get a list of location names that matches or contains the provided value.       
+     * @param string $country and $city
+     * @return array An array containing the matches found.
+     */
+    public function getWhereCityAndCountryLike($city, $country) {
+        $sql = "SELECT * FROM location WHERE city LIKE :city AND country LIKE :country";
+        $data = $this->run($sql, [":city" => $city . "%", ":country" => $country . "%"])->fetchAll();
+        
+        return $data;
+    }
+
     /**
      * 2. Get the details of a given location
      * @param int $locationId the id of the location.
@@ -60,6 +72,16 @@ class LocationModel extends BaseModel {
         
         return $data;
     }
+
+    /**
+     * Update information about one or more location (the /locations resource collection must support this operations).
+     */
+    public function updateLocation2($city, $country, $location_id) {        
+        $sql = "UPDATE location SET city = :city, country = :country WHERE location_id = :location_id";
+        $data = $this->run($sql, [":location_id" => $location_id, ":country" => $country, ":city" => $city]);
+        return $data;      
+    }
+
 
     /**
      * Update information about one or more location (the /locations resource collection must support this operations).
