@@ -18,6 +18,10 @@ class RestaurantModel extends BaseModel
             foreach ($filters as $key => $val) {
                 if ($key == 'name') {
                     $query .= " $key LIKE :$key AND";
+                } else if ($key == 'price_min') {
+                    $query .= " $key >= :$key AND";
+                } else if ($key == 'price_max') {
+                    $query .= " $key <= :$key AND";
                 } else {
                     $query .= " $key = :$key AND";
                 }
