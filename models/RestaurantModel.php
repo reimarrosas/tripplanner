@@ -44,11 +44,11 @@ class RestaurantModel extends BaseModel
             'INSERT INTO restaurant ' .
             '(location_fk, name, price_range, accessibility, charging_station, street) ' .
             'VALUES ' .
-            '(:location, :name, :price, :accessibilty, :charging_station, :street)';
+            '(:location_fk, :name, :price, :accessibilty, :charging_station, :street)';
         return $this->execute($query, $restaurant);
     }
 
-    public function updateSingleRestaurant(array $restaurant): int
+    public function updateSingleRestaurant(int $restaurant_id, array $restaurant): int
     {
         $query = 'UPDATE restaurant SET';
         foreach ($restaurant as $key => $val) {
@@ -58,6 +58,7 @@ class RestaurantModel extends BaseModel
         }
         $query = rtrim($query, ',') . ' WHERE restaurant_id = :restaurant_id';
 
+        $restaurant['restaurant_id'] = $restaurant_id;
         return $this->execute($query, $restaurant);
     }
 

@@ -57,6 +57,7 @@ $app->get('/hello', function (Request $request, Response $response, $args) {
 $app->get('/restaurants', [RestaurantController::class, 'getRestaurants']);
 $app->get('/restaurants/{restaurant_id}', [RestaurantController::class, 'getRestaurant']);
 $app->post('/restaurants', [RestaurantController::class, 'createRestaurant']);
+$app->put('/restaurants/{restaurant_id}', [RestaurantController::class, 'updateRestaurant']);
 
 // Run the app.
 $app->run();

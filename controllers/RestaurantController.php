@@ -52,7 +52,6 @@ class RestaurantController
         return $response;
     }
 
-    // TODO: createRestaurant
     // Route: /restaurants
     public function createRestaurant(Request $request, Response $response, array $args): Response
     {
@@ -63,11 +62,8 @@ class RestaurantController
             throw new HttpUnprocessableEntityException($request, $error);
         }
 
-        $body['charging_station'] = filter_var($body['charging_station'], FILTER_VALIDATE_BOOLEAN);
-
+        $body['charging_station'] = filter_var($body['charging_station'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
         $result = 0;
-
-        var_dump($body);
         try {
             $restaurant_model = new RestaurantModel();
             $result = $restaurant_model->createSingleRestaurant($body);
@@ -83,7 +79,39 @@ class RestaurantController
         return $response->withStatus(201);
     }
 
-    // TODO: updateRestaurant
+    // Route: /restaurants/{restaurant_id}
+    public function updateRestaurant(Request $request, Response $response, array $args): Response
+    {
+        $id = $args['restaurant_id'] ?? false;
+        if (!ctype_digit($id)) {
+            throw new HttpUnprocessableEntityException($request, 'Restaurant ID invalid!');
+        }
+        $id = intval($id);
+
+        $body = $request->getParsedBody();
+        $validation = $this->validateUpdateRestaurant($body);
+
+        if (!empty($validation)) {
+            throw new HttpUnprocessableEntityException($request, $validation);
+        }
+
+        $body['charging_station'] = filter_var($body['charging_station'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $result = 0;
+        try {
+            $restaurant_model = new RestaurantModel();
+            $result = $restaurant_model->updateSingleRestaurant($id, $body);
+        } catch (\Throwable $th) {
+            throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
+        }
+
+        $message = null;
+        if ($result !== 1) {
+            $message = 'Restaurant update resulted in no change!';
+        }
+
+        $response->getBody()->write(json_encode(['message' => $message ?? "Restaurant $id update successful!"]));
+        return $response;
+    }
 
     // TODO: deleteRestaurant
 
@@ -131,11 +159,46 @@ class RestaurantController
             $ret = '`price_min` must either be a decimal or an integer value';
         } else if (!array_key_exists('accessibility', $body) || !is_string($body['accessibility']) || !in_array($body['accessibility'], ['car', 'public', 'walking'])) {
             $ret = '`accessibility` must be a `car`, `public`, or `walking`';
-        } else if (!array_key_exists('charging_station', $body) || filter_var($body['charging_station'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) === null) {
-            $ret = '`charging_station` must be either a truthy or falsy string';
+        } else if (!array_key_exists('charging_station', $body) || !is_bool($body['charging_station'])) {
+            $ret = '`charging_station` must be a boolean value';
         } else if (!array_key_exists('street', $body) || !is_string($body['street']) || empty($body['street'])) {
             $ret = '`street` must be a non-empty string';
         } else if (!array_key_exists('price_max', $body) || (!is_float($body['price_max']) && !is_int($body['price_max']))) {
+            $ret = '`price_max` must either be a decimal or an integer value';
+        }
+
+        return $ret;
+    }
+
+    private function validateUpdateRestaurant(mixed $body): string
+    {
+        if (!is_array($body)) {
+            return 'Request body must be a valid JSON object';
+        }
+
+        $location = $body['location_fk'] ?? false;
+        $name = $body['name'] ?? false;
+        $price_min = $body['price_min'] ?? false;
+        $accessibility = $body['accessibility'] ?? false;
+        $charging_station = array_key_exists('charging_station', $body);
+        $street = $body['street'] ?? false;
+        $price_max = $body['price_max'] ?? false;
+
+        $ret = '';
+
+        if ($location !== false && (!is_int($location) || $location < 1)) {
+            $ret = '`location_fk` must be a value greater than 0';
+        } else if ($name !== false && (!is_string($name) || empty($name))) {
+            $ret = '`name` must a non-empty string';
+        } else if ($price_min !== false && (!is_int($price_min) && !is_float($price_min))) {
+            $ret = '`price_min` must either be a decimal or an integer value';
+        } else if ($accessibility !== false && !in_array($accessibility, ['public', 'walking', 'car'])) {
+            $ret = '`accessibility` must be a `car`, `public`, or `walking`';
+        } else if ($charging_station !== false && !is_bool($charging_station)) {
+            $ret = '`charging_station` must be a boolean value';
+        } else if ($street !== false && (!is_string($street) || empty($street))) {
+            $ret = '`street` must be a non-empty string';
+        } else if ($price_max !== false && (!is_int($price_min) && !is_float($price_min))) {
             $ret = '`price_max` must either be a decimal or an integer value';
         }
 
