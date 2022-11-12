@@ -58,6 +58,7 @@ $app->get('/restaurants', [RestaurantController::class, 'getRestaurants']);
 $app->get('/restaurants/{restaurant_id}', [RestaurantController::class, 'getRestaurant']);
 $app->post('/restaurants', [RestaurantController::class, 'createRestaurant']);
 $app->put('/restaurants/{restaurant_id}', [RestaurantController::class, 'updateRestaurant']);
+$app->delete('/restaurants/{restaurant_id}', [RestaurantController::class, 'deleteRestaurant']);
 
 // Run the app.
 $app->run();

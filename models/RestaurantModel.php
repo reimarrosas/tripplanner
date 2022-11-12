@@ -42,9 +42,9 @@ class RestaurantModel extends BaseModel
     {
         $query =
             'INSERT INTO restaurant ' .
-            '(location_fk, name, price_range, accessibility, charging_station, street) ' .
+            '(location_fk, name, price_min, accessibility, charging_station, street, price_max) ' .
             'VALUES ' .
-            '(:location_fk, :name, :price, :accessibilty, :charging_station, :street)';
+            '(:location_fk, :name, :price_min, :accessibility, :charging_station, :street, :price_max)';
         return $this->execute($query, $restaurant);
     }
 

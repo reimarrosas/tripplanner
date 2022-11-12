@@ -83,10 +83,10 @@ class RestaurantController
     public function updateRestaurant(Request $request, Response $response, array $args): Response
     {
         $id = $args['restaurant_id'] ?? false;
+        $int_id = intval($id);
         if (!ctype_digit($id)) {
             throw new HttpUnprocessableEntityException($request, 'Restaurant ID invalid!');
         }
-        $id = intval($id);
 
         $body = $request->getParsedBody();
         $validation = $this->validateUpdateRestaurant($body);
@@ -94,12 +94,13 @@ class RestaurantController
         if (!empty($validation)) {
             throw new HttpUnprocessableEntityException($request, $validation);
         }
-
         $body['charging_station'] = filter_var($body['charging_station'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+        $body = $this->remapUpdateBody($body);
         $result = 0;
         try {
             $restaurant_model = new RestaurantModel();
-            $result = $restaurant_model->updateSingleRestaurant($id, $body);
+            $result = $restaurant_model->updateSingleRestaurant($int_id, $body);
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
@@ -109,11 +110,34 @@ class RestaurantController
             $message = 'Restaurant update resulted in no change!';
         }
 
-        $response->getBody()->write(json_encode(['message' => $message ?? "Restaurant $id update successful!"]));
+        $response->getBody()->write(json_encode(['message' => $message ?? "Restaurant $int_id update successful!"]));
         return $response;
     }
 
-    // TODO: deleteRestaurant
+    // Route: /restaurants/{restaurant_id}
+    public function deleteRestaurant(Request $request, Response $response, $args): Response
+    {
+        $id = $args['restaurant_id'] ?? false;
+        $int_id = intval($id);
+        if (!ctype_digit($id) || $int_id < 1) {
+            throw new HttpUnprocessableEntityException($request, 'Restaurant ID invalid!');
+        }
+
+        $result = 0;
+        try {
+            $restaurant_model = new RestaurantModel();
+            $result = $restaurant_model->deleteRestaurant($int_id);
+        } catch (\Throwable $th) {
+            throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
+        }
+
+        if ($result !== 1) {
+            throw new HttpNotFoundException($request, "Restaurant $int_id not found!");
+        }
+
+        $response->getBody()->write(json_encode(['message' => "Restaurant $int_id deletion successful!"]));
+        return $response;
+    }
 
     private function parseRestaurantFilters(array $query_params): array
     {
@@ -203,5 +227,18 @@ class RestaurantController
         }
 
         return $ret;
+    }
+
+    private function remapUpdateBody(array $body): array
+    {
+        return [
+            'location_fk' => $body['location_fk'],
+            'name' => $body['name'],
+            'price_min' => $body['price_min'],
+            'accessibility' => $body['accessibility'],
+            'charging_station' => $body['charging_station'],
+            'street' => $body['street'],
+            'price_max' => $body['price_max']
+        ];
     }
 }
