@@ -18,6 +18,10 @@ class RestaurantModel extends BaseModel
             foreach ($filters as $key => $val) {
                 if ($key == 'name') {
                     $query .= " $key LIKE :$key AND";
+                } else if ($key == 'price_min') {
+                    $query .= " $key >= :$key AND";
+                } else if ($key == 'price_max') {
+                    $query .= " $key <= :$key AND";
                 } else {
                     $query .= " $key = :$key AND";
                 }
@@ -38,13 +42,13 @@ class RestaurantModel extends BaseModel
     {
         $query =
             'INSERT INTO restaurant ' .
-            '(location_fk, name, price_range, accessibility, charging_station, street) ' .
+            '(location_fk, name, price_min, accessibility, charging_station, street, price_max) ' .
             'VALUES ' .
-            '(:location, :name, :price, :accessibilty, :charging_station, :street)';
+            '(:location_fk, :name, :price_min, :accessibility, :charging_station, :street, :price_max)';
         return $this->execute($query, $restaurant);
     }
 
-    public function updateSingleRestaurant(array $restaurant): int
+    public function updateSingleRestaurant(int $restaurant_id, array $restaurant): int
     {
         $query = 'UPDATE restaurant SET';
         foreach ($restaurant as $key => $val) {
@@ -54,6 +58,7 @@ class RestaurantModel extends BaseModel
         }
         $query = rtrim($query, ',') . ' WHERE restaurant_id = :restaurant_id';
 
+        $restaurant['restaurant_id'] = $restaurant_id;
         return $this->execute($query, $restaurant);
     }
 

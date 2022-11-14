@@ -13,6 +13,7 @@ require __DIR__ . '/vendor/autoload.php';
 $app = AppFactory::create();
 
 //-- Step 2) Add routing middleware.
+$app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 
 // Middleware that checks if Accept Header is Any or application/json,
@@ -55,6 +56,9 @@ $app->get('/hello', function (Request $request, Response $response, $args) {
 // Restaurants routes
 $app->get('/restaurants', [RestaurantController::class, 'getRestaurants']);
 $app->get('/restaurants/{restaurant_id}', [RestaurantController::class, 'getRestaurant']);
+$app->post('/restaurants', [RestaurantController::class, 'createRestaurant']);
+$app->put('/restaurants/{restaurant_id}', [RestaurantController::class, 'updateRestaurant']);
+$app->delete('/restaurants/{restaurant_id}', [RestaurantController::class, 'deleteRestaurant']);
 
 // Run the app.
 $app->run();

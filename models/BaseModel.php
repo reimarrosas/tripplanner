@@ -276,7 +276,7 @@ class BaseModel
     {
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
-            $stmt->bindParam($key, $val, $this->paramType($val));
+            $stmt->bindValue($key, $val);
         }
         $stmt->execute();
         return $stmt;

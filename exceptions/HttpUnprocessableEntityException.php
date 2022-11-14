@@ -4,7 +4,7 @@ namespace app\exceptions;
 
 use Slim\Exception\HttpSpecializedException;
 
-class HttpUnprocessableEntity extends HttpSpecializedException
+class HttpUnprocessableEntityException extends HttpSpecializedException
 {
     protected $code = 422;
     protected $message = 'Unprocessable Entity';
