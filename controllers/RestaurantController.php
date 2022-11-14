@@ -7,6 +7,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 use app\models\RestaurantModel;
+use Exception;
 use Slim\Exception\HttpInternalServerErrorException;
 use Slim\Exception\HttpNotFoundException;
 
@@ -56,14 +57,14 @@ class RestaurantController
     public function createRestaurant(Request $request, Response $response, array $args): Response
     {
         $body = $request->getParsedBody();
-        $error = $this->validateNewRestaurant($body);
+        $validation = $this->validateRestaurant($body);
 
-        if (!empty($error)) {
-            throw new HttpUnprocessableEntityException($request, $error);
+        if (!empty($validation)) {
+            throw new HttpUnprocessableEntityException($request, $validation);
         }
 
-        $body['charging_station'] = filter_var($body['charging_station'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
         $result = 0;
+
         try {
             $restaurant_model = new RestaurantModel();
             $result = $restaurant_model->createSingleRestaurant($body);
@@ -89,28 +90,28 @@ class RestaurantController
         }
 
         $body = $request->getParsedBody();
-        $validation = $this->validateUpdateRestaurant($body);
+        $validation = $this->validateRestaurant($body);
 
         if (!empty($validation)) {
             throw new HttpUnprocessableEntityException($request, $validation);
         }
-        $body['charging_station'] = filter_var($body['charging_station'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 
-        $body = $this->remapUpdateBody($body);
-        $result = 0;
+        $body = $this->remapBody($body);
         try {
             $restaurant_model = new RestaurantModel();
-            $result = $restaurant_model->updateSingleRestaurant($int_id, $body);
+
+            if (empty($restaurant_model->getSingleRestaurant($int_id))) {
+                throw new HttpNotFoundException($request, "Restaurant $int_id does not exist!");
+            }
+
+            $restaurant_model->updateSingleRestaurant($int_id, $body);
+        } catch (HttpNotFoundException $ex) {
+            throw $ex;
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
 
-        $message = null;
-        if ($result !== 1) {
-            $message = 'Restaurant update resulted in no change!';
-        }
-
-        $response->getBody()->write(json_encode(['message' => $message ?? "Restaurant $int_id update successful!"]));
+        $response->getBody()->write(json_encode(['message' => "Restaurant $int_id update successful!"]));
         return $response;
     }
 
@@ -167,14 +168,16 @@ class RestaurantController
         return $ret;
     }
 
-    private function validateNewRestaurant(mixed $body): string
+    private function validateRestaurant(mixed $body): string
     {
-        $ret = '';
         if (!is_array($body)) {
-            $ret = 'Request body must be a valid JSON object';
-        } else if (empty($body)) {
+            return 'Request body must be a valid JSON object';
+        }
+
+        $ret = '';
+
+        if (empty($body)) {
             $ret = 'Request must contain location_fk, name, price_min, accessibility, charging_station, street, and price_max';
-            return $ret;
         } else if (!array_key_exists('location_fk', $body) || !is_int($body['location_fk']) || $body['location_fk'] < 1) {
             $ret = '`location_fk` must be a value greater than 0';
         } else if (!array_key_exists('name', $body) || !is_string($body['name']) || empty($body['name'])) {
@@ -194,42 +197,7 @@ class RestaurantController
         return $ret;
     }
 
-    private function validateUpdateRestaurant(mixed $body): string
-    {
-        if (!is_array($body)) {
-            return 'Request body must be a valid JSON object';
-        }
-
-        $location = $body['location_fk'] ?? false;
-        $name = $body['name'] ?? false;
-        $price_min = $body['price_min'] ?? false;
-        $accessibility = $body['accessibility'] ?? false;
-        $charging_station = array_key_exists('charging_station', $body);
-        $street = $body['street'] ?? false;
-        $price_max = $body['price_max'] ?? false;
-
-        $ret = '';
-
-        if ($location !== false && (!is_int($location) || $location < 1)) {
-            $ret = '`location_fk` must be a value greater than 0';
-        } else if ($name !== false && (!is_string($name) || empty($name))) {
-            $ret = '`name` must a non-empty string';
-        } else if ($price_min !== false && (!is_int($price_min) && !is_float($price_min))) {
-            $ret = '`price_min` must either be a decimal or an integer value';
-        } else if ($accessibility !== false && !in_array($accessibility, ['public', 'walking', 'car'])) {
-            $ret = '`accessibility` must be a `car`, `public`, or `walking`';
-        } else if ($charging_station !== false && !is_bool($charging_station)) {
-            $ret = '`charging_station` must be a boolean value';
-        } else if ($street !== false && (!is_string($street) || empty($street))) {
-            $ret = '`street` must be a non-empty string';
-        } else if ($price_max !== false && (!is_int($price_min) && !is_float($price_min))) {
-            $ret = '`price_max` must either be a decimal or an integer value';
-        }
-
-        return $ret;
-    }
-
-    private function remapUpdateBody(array $body): array
+    private function remapBody(array $body): array
     {
         return [
             'location_fk' => $body['location_fk'],
