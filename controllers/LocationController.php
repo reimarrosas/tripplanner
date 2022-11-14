@@ -95,22 +95,23 @@ class LocationController
             $location_id = $single_location["location_id"];
             $country = $single_location["country"];
             $city = $single_location["city"];
-            
-            /**if (isset($artist_id)) {
-                // This will check if the id exists in the table
-                $id = $artist_model->check($artist_id);
-                if ($id == null) {
-                    // If matches are found
-                    $response_data = makeCustomJSONError("resourceNotFound", "The Artist ID ".$artist_id." doesn't exist, please enter another id");
-                    $response->getBody()->write($response_data);
-                    return $response->withStatus(HTTP_NOT_FOUND);
-                }
-            }*/
-    
+
+            if (!is_string($country) || empty($country)) {
+                throw new HttpUnprocessableEntityException($request, "Error in country input");
+            }
+            if (!is_string($city) || empty($city)) {
+                throw new HttpUnprocessableEntityException($request, "Error in city input");
+            }
+        }
+
+        for ($i = 0; $i < count($data); $i++) {
+            $single_location = $data[$i];
+            $location_id = $single_location["location_id"];
+            $country = $single_location["country"];
+            $city = $single_location["city"];
+
             array_push($arr, "The resource for location id : ".$location_id. " has been modified");
-            echo"hello";
-            $location_model->updateLocation2($city, $country, $location_id);
-            echo"hello";
+            $location_model->updateLocation($city, $country, $location_id);
         }
     
         $response_data = json_encode($arr);
@@ -136,38 +137,49 @@ class LocationController
             $country = $single_location["country"];
             $city = $single_location["city"];
             
-            /**if (isset($location_id)) {
-                // This will check if the id already exist in the table
-                $id = $artist_model->check($artist_id);
-                if ($id != null) {
-                    // If matches are found
-                    $response_data = makeCustomJSONError("resourceNotFound", "The Artist ID ".$artist_id." already exists, please enter another id");
-                    $response->getBody()->write($response_data);
-                    return $response->withStatus(HTTP_NOT_FOUND);
-                }
-            }*/
+            if (!is_string($country) || empty($country)) {
+                throw new HttpUnprocessableEntityException($request, "Error in country input");
+            }
+            if (!is_string($city) || empty($city)) {
+                throw new HttpUnprocessableEntityException($request, "Error in city input");
+            }
+
+        }
+
+        for ($i = 0; $i < count($parsed_data); $i++) {
+            $single_location = $parsed_data[$i];
+    
+            $location_id = $single_location["location_id"];
+            $country = $single_location["country"];
+            $city = $single_location["city"];
     
             $location_record = array("location_id" => $location_id, "country" => $country, "city" => $city);
             array_push($arr, "Location id : ".$location_id. " is created");
             $location_model->createLocation($location_record);
+            
         }
-        //$response->getBody()->write($artist_id.$artistName);
+
         $response_data = json_encode($arr);
         $response->getBody()->write($response_data);
-        return $response;
+        return $response->withStatus(201);
     }
-    
-    private function parseLocationFilters(array $query_params): array
-    {
-        $country = $query_params['country'] ?? false;
-        $city = $query_params['city'] ?? false;
 
-        $ret = [];
-        if ($country !== false) {
-            $ret['country'] = "%$country%";
-        }
-        if ($city !== false) {
-            $ret['city'] = "%$city%";
+    private function validateNewLocation(mixed $body): string
+    {
+        $ret = '';
+        if (!is_array($body)) {
+            $ret = 'Request body must be a valid JSON object';
+            echo"1";
+        } else if (empty($body)) {
+            $ret = 'Request must contain country, city';
+            echo"2";
+            return $ret;
+        } else if (!array_key_exists('country', $body) /**|| !is_string($body['country']) /|| empty($body['country'])*/) {
+            $ret = '`country` must a non-empty string';
+            echo"3";
+        } else if (!array_key_exists('city', $body) || !is_string($body['city']) || empty($body['city'])) {
+            $ret = '`city` must be a non-empty string';
+            echo"4";
         }
 
         return $ret;

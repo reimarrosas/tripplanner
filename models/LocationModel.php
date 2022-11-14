@@ -76,18 +76,9 @@ class LocationModel extends BaseModel {
     /**
      * Update information about one or more location (the /locations resource collection must support this operations).
      */
-    public function updateLocation2($city, $country, $location_id) {        
+    public function updateLocation($city, $country, $location_id) {        
         $sql = "UPDATE location SET city = :city, country = :country WHERE location_id = :location_id";
         $data = $this->run($sql, [":location_id" => $location_id, ":country" => $country, ":city" => $city]);
-        return $data;      
-    }
-
-
-    /**
-     * Update information about one or more location (the /locations resource collection must support this operations).
-     */
-    public function updateLocation($data, $where) {        
-        $data = $this->update("location", $data, $where);
         return $data;      
     }
 

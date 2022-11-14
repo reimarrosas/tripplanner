@@ -24,9 +24,9 @@ class HotelController
             if (isset($query_params["name"])) { //filters base on the name
                 $result = $hotel_model->getWhereNameLike($query_params["name"]);
             }
-            if (isset($query_params["price_range"])) { //filters based on the price range
+            /**if (isset($query_params["price_range"])) { //filters based on the price range
                 $result = $hotel_model->getWherePriceLike($query_params["price_range"]);
-            }
+            }*/
             if (isset($query_params["accessibility"])) { // filters based on the accessibility
                 $result = $hotel_model->getWhereAccessibilityLike($query_params["accessibility"]);
             }
@@ -96,28 +96,16 @@ class HotelController
     
         for ($i = 0; $i < count($data); $i++) {
             $single_hotel = $data[$i];
-            $hotel_id = $single_location["hotel_id"];
-            $name = $single_location["name"];
-            $charging_station = $single_location["charging_station"];
-            $street = $single_location["street"];
-            $price_range = $single_location["price_range"];
-            $accessibility = $single_location["accessibility"];
+            $hotel_id = $single_hotel["hotel_id"];
+            $name = $single_hotel["name"];
+            $charging_station = $single_hotel["charging_station"];
+            $street = $single_hotel["Street"];
+            $price_min = $single_hotel["price_min"];
+            $price_max = $single_hotel["price_max"];
+            $accessibility = $single_hotel["accessibility"];
             
-            /**if (isset($artist_id)) {
-                // This will check if the id exists in the table
-                $id = $artist_model->check($artist_id);
-                if ($id == null) {
-                    // If matches are found
-                    $response_data = makeCustomJSONError("resourceNotFound", "The Artist ID ".$artist_id." doesn't exist, please enter another id");
-                    $response->getBody()->write($response_data);
-                    return $response->withStatus(HTTP_NOT_FOUND);
-                }
-            }*/
-    
-            array_push($arr, "The resource for location id : ".$location_id. " has been modified");
-            echo"hello";
-            $location_model->updateLocation2($city, $country, $location_id);
-            echo"hello";
+            array_push($arr, "The resource for hotel id : ".$hotel_id. " has been modified");
+            $hotel_model->updateHotel($hotel_id, $name, $charging_station, $street, $price_min, $price_max, $accessibility);
         }
     
         $response_data = json_encode($arr);
@@ -130,22 +118,24 @@ class HotelController
         $hotel_model = new HotelModel();
         $parsed_data = $request->getParsedBody();
         $arr = array(); // creating empty arrays
-       //var_dump($parsed_data); exit;
         $data_string = "";
-        $name = "";
-        $charging_station = "";
-        $street = "";
-        $price_range = "";
-        $accessibility = "";
+        $hotel_id = "";
+        $name =  "";
+        $charging_station =  "";
+        $street =  "";
+        $price_min =  "";
+        $price_max =  "";
+        $accessibility =  "";
 
         for ($i = 0; $i < count($parsed_data); $i++) {
             $single_hotel = $parsed_data[$i];
-    
-            $hotel_id = $single_hotel["location_id"];
-            $name = $single_hotel["name"];
+
+            $hotel_id = $single_hotel["hotel_id"];
+            $name =  $single_hotel["name"];
             $charging_station = $single_hotel["charging_station"];
-            $street = $single_hotel["street"];
-            $price_range = $single_hotel["price_range"];
+            $street =  $single_hotel["street"];
+            $price_min =  $single_hotel["price_min"];
+            $price_max =  $single_hotel["price_max"];
             $accessibility = $single_hotel["accessibility"];
             
             /**if (isset($location_id)) {
@@ -159,7 +149,7 @@ class HotelController
                 }
             }*/
     
-            $hotel_record = array("hotel_id" => $hotel_id, "name" => $name, "charging_station" => $charging_station, "street" => $street, "price_range" => $price_range, "accessibility" => $accessibility);
+            $hotel_record = array("hotel_id" => $hotel_id, "name" => $name, "charging_station" => $charging_station, "price_min" => $price_min, "Street" => $street, "price_max" => $price_max, "accessibility" => $accessibility);
             array_push($arr, "hotel_id : ".$hotel_id. " is created");
             $hotel_model->createHotel($hotel_record);
         }
@@ -175,7 +165,8 @@ class HotelController
         $name = $query_params['name'] ?? false;
         $charging_station = $query_params['charging_station'] ?? false;
         $street = $query_params['street'] ?? false;
-        $price_range = $query_params['price_range'] ?? false;
+        $price_max = $query_params['price_max'] ?? false;
+        $price_min = $query_params['price_min'] ?? false;
         $accessibility = $query_params['accessibility'] ?? false;
 
         $ret = [];
@@ -185,8 +176,11 @@ class HotelController
         if ($street !== false) {
             $ret['street'] = "%$street%";
         }
-        if ($price_range !== false) {
-            $ret['price_range'] = $price_range;
+        if ($price_max !== false) {
+            $ret['price_max'] = $price_max;
+        }
+        if ($price_min !== false) {
+            $ret['price_min'] = $price_min;
         }
         if ($accessibility !== false) {
             $ret['accessibility'] = $accessibility;

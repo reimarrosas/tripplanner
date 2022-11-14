@@ -37,11 +37,12 @@ class HotelModel extends BaseModel {
         return $data;
     }
 
-    /**
-     * Update information about one or more location (the /hotels resource collection must support this operations).
+     /**
+     * Update information about one or more location (the /locations resource collection must support this operations).
      */
-    public function updateHotel($data, $where) {        
-        $data = $this->update("hotel", $data, $where);
+    public function updateHotel($hotel_id, $name, $charging_station, $street, $price_min, $price_max, $accessibility) {        
+        $sql = "UPDATE hotel SET name = :name, charging_station = :charging_station, street = :street, price_min = :price_min, price_max = :price_max, accessibility = :accessibility  WHERE hotel_id = :hotel_id";
+        $data = $this->run($sql, [":hotel_id" => $hotel_id, ":name" => $name, ":charging_station" => $charging_station, ":street" => $street, ":price_min" => $price_min, ":price_max" => $price_max, ":accessibility" => $accessibility]);
         return $data;      
     }
 
