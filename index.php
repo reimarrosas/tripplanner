@@ -1,5 +1,6 @@
 <?php
 
+use app\controllers\FoodController;
 use app\controllers\RestaurantController;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -59,6 +60,12 @@ $app->get('/restaurants/{restaurant_id}', [RestaurantController::class, 'getRest
 $app->post('/restaurants', [RestaurantController::class, 'createRestaurant']);
 $app->put('/restaurants/{restaurant_id}', [RestaurantController::class, 'updateRestaurant']);
 $app->delete('/restaurants/{restaurant_id}', [RestaurantController::class, 'deleteRestaurant']);
+// Food routes
+$app->get('/restaurants/{restaurant_id}/food', [FoodController::class, 'getAllFood']);
+$app->get('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'getSingleFood']);
+$app->post('/restaurants/{restaurant_id}/food', [FoodController::class, 'createFood']);
+$app->put('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'updateFood']);
+$app->delete('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'deleteFood']);
 
 // Run the app.
 $app->run();

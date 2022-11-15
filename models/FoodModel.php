@@ -14,10 +14,10 @@ class FoodModel extends BaseModel
         $query = 'SELECT * FROM FOOD WHERE restaurant_fk = :restaurant_id';
         return $this->fetchAll($query, ['restaurant_id' => $restaurant_id]);
     }
-    public function getSingleFood(int $food_id): array
+    public function getSingleFood(int $restaurant_fk, int $food_id): array
     {
-        $query = 'SELECT * FROM FOOD WHERE food_id = :food_id';
-        return $this->fetchSingle($query, ['food_id' => $food_id]);
+        $query = 'SELECT * FROM FOOD WHERE restaurant_fk = :restaurant_fk AND food_id = :food_id';
+        return $this->fetchSingle($query, ['food_id' => $food_id, 'restaurant_fk' => $restaurant_fk]);
     }
 
     public function createSingleFood(array $food): int
@@ -32,19 +32,19 @@ class FoodModel extends BaseModel
 
     public function updateSingleFood(array $food): int
     {
-        $query = 'UPDATE food SET';
-        foreach ($food as $key => $value) {
-            if ($key != 'food_id') {
-                $query .= " $key = :$key,";
-            }
-        }
-        $query = rtrim($query, ',') . ' WHERE food_id = :food_id';
+        $query =
+            'UPDATE food ' .
+            'SET restaurant_fk = :restaurant_fk, ' .
+            'type = :type, ' .
+            'name = :name, ' .
+            'price = :price ' .
+            'WHERE food_id = :food_id';
         return $this->execute($query, $food);
     }
 
-    public function deleteFood(int $food_id): int
+    public function deleteFood(int $restaurant_fk, int $food_id): int
     {
-        $query = 'DELETE FROM food WHERE food_id = :food_id';
-        return $this->execute($query, ['food_id' => $food_id]);
+        $query = 'DELETE FROM food WHERE restaurant_fk = :restaurant_fk AND food_id = :food_id';
+        return $this->execute($query, ['food_id' => $food_id, 'restaurant_fk' => $restaurant_fk]);
     }
 }
