@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\exceptions\HttpUnprocessableEntity;
+use app\exceptions\HttpUnprocessableEntityException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -16,25 +16,11 @@ class HotelController
     // TODO: Pagination
     public function getHotels(Request $request, Response $response, array $args): Response
     {
-        $query_params = $request->getQueryParams(); 
+        $query_params = $request->getQueryParams();
         $filters = $this->parseHotelFilters($query_params);
-        $result = null;
         try {
             $hotel_model = new HotelModel();
-            if (isset($query_params["name"])) { //filters base on the name
-                $result = $hotel_model->getWhereNameLike($query_params["name"]);
-            }
-            /**if (isset($query_params["price_range"])) { //filters based on the price range
-                $result = $hotel_model->getWherePriceLike($query_params["price_range"]);
-            }*/
-            if (isset($query_params["accessibility"])) { // filters based on the accessibility
-                $result = $hotel_model->getWhereAccessibilityLike($query_params["accessibility"]);
-            }
-            if (isset($query_params["charging_station"])) { // filters based on the charging station
-                $result = $hotel_model->getWhereChargingStationLike($query_params["charging_station"]);
-            } else {
-                $result = $hotel_model->getAllHotels($filters); // gets all the hotels
-            }
+            $result = $hotel_model->getAllHotels($filters);
             $response->getBody()->write(json_encode($result));
             return $response;
         } catch (\Throwable $th) {
@@ -103,9 +89,51 @@ class HotelController
             $price_min = $single_hotel["price_min"];
             $price_max = $single_hotel["price_max"];
             $accessibility = $single_hotel["accessibility"];
+            $location_fk = $single_hotel["location_fk"];
+            
+            if (!is_string($name) || empty($name)) {
+                throw new HttpUnprocessableEntityException($request, "Error in name input");
+            }
+            if ($charging_station == "1") {
+                //
+            } else if($charging_station == "0") {
+                //
+            } else {
+                throw new HttpUnprocessableEntityException($request, "Error in charging input");
+            }
+            if (!is_string($street) || empty($street)) {
+                throw new HttpUnprocessableEntityException($request, "Error in street input");
+            }
+            if ((!is_numeric($price_min)) || empty($price_min)) {
+                throw new HttpUnprocessableEntityException($request, "Error in price mininum input");
+            }
+            if ($accessibility == "walking") {
+                //
+            } else if ($accessibility == "car") {
+                //
+            } else if ($accessibility == "public") {
+                //
+            } else {
+                throw new HttpUnprocessableEntityException($request, "Error in accessibility input");
+            }
+            if ((!is_numeric($price_min)) || empty($price_max)) {
+                throw new HttpUnprocessableEntityException($request, "Error in price maximun input");
+            }
+        }
+
+        for ($i = 0; $i < count($data); $i++) {
+            $single_hotel = $data[$i];
+            $hotel_id = $single_hotel["hotel_id"];
+            $name = $single_hotel["name"];
+            $charging_station = $single_hotel["charging_station"];
+            $street = $single_hotel["Street"];
+            $price_min = $single_hotel["price_min"];
+            $price_max = $single_hotel["price_max"];
+            $accessibility = $single_hotel["accessibility"];
+            $location_fk = $single_hotel["location_fk"];
             
             array_push($arr, "The resource for hotel id : ".$hotel_id. " has been modified");
-            $hotel_model->updateHotel($hotel_id, $name, $charging_station, $street, $price_min, $price_max, $accessibility);
+            $hotel_model->updateHotel($hotel_id, $name, $charging_station, $street, $price_min, $price_max, $accessibility, $location_fk);
         }
     
         $response_data = json_encode($arr);
@@ -120,6 +148,7 @@ class HotelController
         $arr = array(); // creating empty arrays
         $data_string = "";
         $hotel_id = "";
+        $hotel_fk = "";
         $name =  "";
         $charging_station =  "";
         $street =  "";
@@ -131,32 +160,67 @@ class HotelController
             $single_hotel = $parsed_data[$i];
 
             $hotel_id = $single_hotel["hotel_id"];
+            $location_fk = $single_hotel["location_fk"];
             $name =  $single_hotel["name"];
             $charging_station = $single_hotel["charging_station"];
-            $street =  $single_hotel["street"];
+            $street =  $single_hotel["Street"];
             $price_min =  $single_hotel["price_min"];
             $price_max =  $single_hotel["price_max"];
             $accessibility = $single_hotel["accessibility"];
             
-            /**if (isset($location_id)) {
-                // This will check if the id already exist in the table
-                $id = $artist_model->check($artist_id);
-                if ($id != null) {
-                    // If matches are found
-                    $response_data = makeCustomJSONError("resourceNotFound", "The Artist ID ".$artist_id." already exists, please enter another id");
-                    $response->getBody()->write($response_data);
-                    return $response->withStatus(HTTP_NOT_FOUND);
-                }
-            }*/
-    
-            $hotel_record = array("hotel_id" => $hotel_id, "name" => $name, "charging_station" => $charging_station, "price_min" => $price_min, "Street" => $street, "price_max" => $price_max, "accessibility" => $accessibility);
+            if (!is_string($name) || empty($name)) {
+                throw new HttpUnprocessableEntityException($request, "Error in name input");
+            }
+            if ($charging_station == "1") {
+                //
+            } else if($charging_station == "0") {  
+                //
+            } else {
+                throw new HttpUnprocessableEntityException($request, "Error in charging input");
+            }
+            if (!is_string($street) || empty($street)) {
+                throw new HttpUnprocessableEntityException($request, "Error in street input");
+            }
+            if ((!is_numeric($price_min)) || empty($price_min)) {
+                throw new HttpUnprocessableEntityException($request, "Error in price mininum input");
+            }
+            if (!is_string($accessibility)) {
+                throw new HttpUnprocessableEntityException($request, "Error in accessibility input");
+            } else if ($accessibility == "walking") {
+                //
+            } else if ($accessibility == "car") {
+                //
+            }  else if ($accessibility == "public") {
+                //
+            } else {
+                throw new HttpUnprocessableEntityException($request, "Error in accessibility input");
+            }
+            if ((!is_numeric($price_min)) || empty($price_max)) {
+                throw new HttpUnprocessableEntityException($request, "Error in price maximun input");
+            }
+
+        }
+
+        for ($i = 0; $i < count($parsed_data); $i++) {
+            $single_hotel = $parsed_data[$i];
+
+            $hotel_id = $single_hotel["hotel_id"];
+            $location_fk = $single_hotel["location_fk"];
+            $name =  $single_hotel["name"];
+            $charging_station = $single_hotel["charging_station"];
+            $street =  $single_hotel["Street"];
+            $price_min =  $single_hotel["price_min"];
+            $price_max =  $single_hotel["price_max"];
+            $accessibility = $single_hotel["accessibility"];
+            
+            $hotel_record = array("hotel_id" => $hotel_id, "name" => $name, "charging_station" => $charging_station, "price_min" => $price_min, "Street" => $street, "price_max" => $price_max, "accessibility" => $accessibility, "location_fk" => $location_fk);
             array_push($arr, "hotel_id : ".$hotel_id. " is created");
             $hotel_model->createHotel($hotel_record);
         }
-        //$response->getBody()->write($artist_id.$artistName);
+        
         $response_data = json_encode($arr);
         $response->getBody()->write($response_data);
-        return $response;
+        return $response->withStatus(201);
     }
 
    

@@ -82,6 +82,9 @@ class LocationModel extends BaseModel {
         return $data;      
     }
 
+    /**
+     * Creates one or multiple locations
+     */
     public function createLocation($data) {
         $data = $this->insert("location", $data);
         

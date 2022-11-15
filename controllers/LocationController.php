@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\exceptions\HttpUnprocessableEntity;
+use app\exceptions\HttpUnprocessableEntityException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -163,23 +163,17 @@ class LocationController
         $response->getBody()->write($response_data);
         return $response->withStatus(201);
     }
-
-    private function validateNewLocation(mixed $body): string
+    private function parseLocationFilters(array $query_params): array
     {
-        $ret = '';
-        if (!is_array($body)) {
-            $ret = 'Request body must be a valid JSON object';
-            echo"1";
-        } else if (empty($body)) {
-            $ret = 'Request must contain country, city';
-            echo"2";
-            return $ret;
-        } else if (!array_key_exists('country', $body) /**|| !is_string($body['country']) /|| empty($body['country'])*/) {
-            $ret = '`country` must a non-empty string';
-            echo"3";
-        } else if (!array_key_exists('city', $body) || !is_string($body['city']) || empty($body['city'])) {
-            $ret = '`city` must be a non-empty string';
-            echo"4";
+        $country = $query_params['country'] ?? false;
+        $city = $query_params['city'] ?? false;
+
+        $ret = [];
+        if ($country !== false) {
+            $ret['country'] = "%$country%";
+        }
+        if ($city !== false) {
+            $ret['city'] = "%$city%";
         }
 
         return $ret;
