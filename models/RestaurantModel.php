@@ -50,15 +50,17 @@ class RestaurantModel extends BaseModel
 
     public function updateSingleRestaurant(int $restaurant_id, array $restaurant): int
     {
-        $query = 'UPDATE restaurant SET';
-        foreach ($restaurant as $key => $val) {
-            if ($key != 'restaurant_id') {
-                $query .= " $key = :$key,";
-            }
-        }
-        $query = rtrim($query, ',') . ' WHERE restaurant_id = :restaurant_id';
-
         $restaurant['restaurant_id'] = $restaurant_id;
+        $query =
+            'UPDATE restaurant ' .
+            'SET location_fk = :location_fk, ' .
+            'name = :name, ' .
+            'price_min = :price_min, ' .
+            'accessibility = :accessibility, ' .
+            'charging_station = :charging_station, ' .
+            'street = :street, ' .
+            'price_max = :price_max ' .
+            'WHERE restaurant_id = :restaurant_id';
         return $this->execute($query, $restaurant);
     }
 
