@@ -76,6 +76,7 @@ class AttractionController
         return $response;
     }
 
+    // Route: /attractions
     function updateAttraction(Request $request, Response $response, array $args) {
         $attraction_model = new AttractionModel();
         $data = $request->getParsedBody();
@@ -142,6 +143,7 @@ class AttractionController
        // return $response;
     }
    
+    // Route: /attractions
     function createAttraction(Request $request, Response $response, array $args) {
         $attraction_model = new AttractionModel();
         $parsed_data = $request->getParsedBody();
@@ -210,8 +212,9 @@ class AttractionController
             $parking = $single_attraction["parking"];
             $location_fk = $single_attraction["location_fk"];
             
-            
-            $attraction_record = array("attraction_id" => $attraction_id, "name" => $name, "charging_station" => $charging_station, "name" => $name, "street" => $street, "price_min" => $price_min, "price_max" => $price_max, "parking" => $parking, "location_fk" => $location_fk);
+            $attraction_record = array("attraction_id" => $attraction_id, "name" => $name, "charging_station" => 
+            $charging_station, "name" => $name, "street" => $street, "price_min" => $price_min, "price_max" => $price_max, 
+            "parking" => $parking, "location_fk" => $location_fk);
             array_push($arr, "Attraction id : ".$attraction_id. " is created");
             $attraction_model->createAttraction($attraction_record);
         }

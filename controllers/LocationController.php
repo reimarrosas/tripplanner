@@ -85,6 +85,7 @@ class LocationController
         return $response;
     }
 
+    // Route: /locations
     function updateLocation(Request $request, Response $response, array $args) {
         $location_model = new LocationModel();
         $data = $request->getParsedBody();
@@ -117,14 +118,13 @@ class LocationController
         $response_data = json_encode($arr);
         $response->getBody()->write($response_data);
         return $response;
-       // return $response;
     }
    
+    // Route: /locations
     function createLocation(Request $request, Response $response, array $args) {
         $location_model = new LocationModel();
         $parsed_data = $request->getParsedBody();
         $arr = array(); // creating empty arrays
-       //var_dump($parsed_data); exit;
         $data_string = "";
         $location_id ="";
         $country = "";
@@ -156,13 +156,13 @@ class LocationController
             $location_record = array("location_id" => $location_id, "country" => $country, "city" => $city);
             array_push($arr, "Location id : ".$location_id. " is created");
             $location_model->createLocation($location_record);
-            
         }
 
         $response_data = json_encode($arr);
         $response->getBody()->write($response_data);
         return $response->withStatus(201);
     }
+
     private function parseLocationFilters(array $query_params): array
     {
         $country = $query_params['country'] ?? false;

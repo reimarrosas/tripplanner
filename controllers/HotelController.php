@@ -75,6 +75,7 @@ class HotelController
         return $response;
     }
 
+    // Route: /hotels
     function updateHotel(Request $request, Response $response, array $args) {
         $hotel_model = new HotelModel();
         $data = $request->getParsedBody();
@@ -142,6 +143,7 @@ class HotelController
        // return $response;
     }
    
+    // Route: /hotels
     function createHotel(Request $request, Response $response, array $args) {
         $hotel_model = new HotelModel();
         $parsed_data = $request->getParsedBody();
@@ -158,7 +160,6 @@ class HotelController
 
         for ($i = 0; $i < count($parsed_data); $i++) {
             $single_hotel = $parsed_data[$i];
-
             $hotel_id = $single_hotel["hotel_id"];
             $location_fk = $single_hotel["location_fk"];
             $name =  $single_hotel["name"];
@@ -203,7 +204,6 @@ class HotelController
 
         for ($i = 0; $i < count($parsed_data); $i++) {
             $single_hotel = $parsed_data[$i];
-
             $hotel_id = $single_hotel["hotel_id"];
             $location_fk = $single_hotel["location_fk"];
             $name =  $single_hotel["name"];
