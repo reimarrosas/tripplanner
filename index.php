@@ -1,6 +1,9 @@
 <?php
 
 use app\controllers\RestaurantController;
+use app\controllers\LocationController;
+use app\controllers\HotelController;
+use app\controllers\AttractionController;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 //var_dump($_SERVER["REQUEST_METHOD"]);
@@ -59,6 +62,21 @@ $app->get('/restaurants/{restaurant_id}', [RestaurantController::class, 'getRest
 $app->post('/restaurants', [RestaurantController::class, 'createRestaurant']);
 $app->put('/restaurants/{restaurant_id}', [RestaurantController::class, 'updateRestaurant']);
 $app->delete('/restaurants/{restaurant_id}', [RestaurantController::class, 'deleteRestaurant']);
+$app->get('/locations', [LocationController::class, 'getLocations']);
+$app->get('/locations/{location_id}', [LocationController::class, 'getLocation']);
+$app->delete('/locations/{location_id}', [LocationController::class, 'deleteLocation']);
+$app->post('/locations', [LocationController::class, 'createLocation']);
+$app->put('/locations', [LocationController::class, 'updateLocation']);
+$app->get('/hotels', [HotelController::class, 'getHotels']);
+$app->get('/hotels/{hotel_id}', [HotelController::class, 'gethotel']);
+$app->delete('/hotels/{hotel_id}', [HotelController::class, 'deleteHotel']);
+$app->post('/hotels', [HotelController::class, 'createHotel']);
+$app->put('/hotels', [HotelController::class, 'updateHotel']);
+$app->get('/attractions', [AttractionController::class, 'getAttractions']);
+$app->get('/attractions/{attraction_id}', [AttractionController::class, 'getAttraction']);
+$app->delete('/attractions/{attraction_id}', [AttractionController::class, 'deleteAttraction']);
+$app->post('/attractions', [AttractionController::class, 'createAttraction']);
+$app->put('/attractions', [AttractionController::class, 'updateAttraction']);
 
 // Run the app.
 $app->run();
