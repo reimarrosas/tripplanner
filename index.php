@@ -1,5 +1,6 @@
 <?php
 
+use app\controllers\FoodController;
 use app\controllers\RestaurantController;
 use app\controllers\LocationController;
 use app\controllers\HotelController;
@@ -62,6 +63,12 @@ $app->get('/restaurants/{restaurant_id}', [RestaurantController::class, 'getRest
 $app->post('/restaurants', [RestaurantController::class, 'createRestaurant']);
 $app->put('/restaurants/{restaurant_id}', [RestaurantController::class, 'updateRestaurant']);
 $app->delete('/restaurants/{restaurant_id}', [RestaurantController::class, 'deleteRestaurant']);
+// Food routes
+$app->get('/restaurants/{restaurant_id}/food', [FoodController::class, 'getAllFood']);
+$app->get('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'getSingleFood']);
+$app->post('/restaurants/{restaurant_id}/food', [FoodController::class, 'createFood']);
+$app->put('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'updateFood']);
+$app->delete('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'deleteFood']);
 $app->get('/locations', [LocationController::class, 'getLocations']);
 $app->get('/locations/{location_id}', [LocationController::class, 'getLocation']);
 $app->delete('/locations/{location_id}', [LocationController::class, 'deleteLocation']);
