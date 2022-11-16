@@ -74,6 +74,7 @@ $app->get('/locations/{location_id}', [LocationController::class, 'getLocation']
 $app->delete('/locations/{location_id}', [LocationController::class, 'deleteLocation']);
 $app->post('/locations', [LocationController::class, 'createLocation']);
 $app->put('/locations', [LocationController::class, 'updateLocation']);
+$app->get('/locations/{location_id}/climate', [LocationController::class, 'getClimate']);
 $app->get('/hotels', [HotelController::class, 'getHotels']);
 $app->get('/hotels/{hotel_id}', [HotelController::class, 'gethotel']);
 $app->delete('/hotels/{hotel_id}', [HotelController::class, 'deleteHotel']);
