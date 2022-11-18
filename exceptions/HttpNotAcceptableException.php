@@ -1,5 +1,7 @@
 <?php
 
+namespace app\exceptions;
+
 use Slim\Exception\HttpSpecializedException;
 
 class HttpNotAcceptableException extends HttpSpecializedException
