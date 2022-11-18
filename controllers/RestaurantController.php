@@ -7,21 +7,28 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 use app\models\RestaurantModel;
-use Exception;
 use Slim\Exception\HttpInternalServerErrorException;
 use Slim\Exception\HttpNotFoundException;
 
 class RestaurantController
 {
     // Route: /restaurants
-    // TODO: Pagination
     public function getRestaurants(Request $request, Response $response, array $args): Response
     {
         $query_params = $request->getQueryParams();
         $filters = $this->parseRestaurantFilters($query_params);
+        $page_num = $query_params['page'] ?? '1';
+        $page_size = $query_params['page_size'] ?? '3';
+        
+        if (!ctype_digit($page_num) || intval($page_num) < 1) {
+            throw new HttpUnprocessableEntityException($request, 'Page Number should be an integer > 0!');
+        } else if (!ctype_digit($page_size) || intval($page_size) < 1) {
+            throw new HttpUnprocessableEntityException($request, 'Page Size should be an integer > 0!');
+        }
+
         try {
             $restaurant_model = new RestaurantModel();
-            $result = $restaurant_model->getAllRestaurants($filters);
+            $result = $restaurant_model->getAllRestaurants($filters, $page_num, $page_size);
             $response->getBody()->write(json_encode($result));
             return $response;
         } catch (\Throwable $th) {
@@ -153,10 +160,10 @@ class RestaurantController
             $ret['name'] = "%$name%";
         }
         if ($price_max !== false) {
-            $ret['price_max'] = $price_max;
+            $ret['price_max'] = floatval($price_max);
         }
         if ($price_min !== false) {
-            $ret['price_min'] = $price_min;
+            $ret['price_min'] = floatval($price_min);
         }
         if ($accessibility !== false) {
             $ret['accessibility'] = $accessibility;

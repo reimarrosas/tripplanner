@@ -9,7 +9,7 @@ class RestaurantModel extends BaseModel
         parent::__construct();
     }
 
-    public function getAllRestaurants(array $filters): array
+    public function getAllRestaurants(array $filters, $page_num, $page_size): array
     {
         $query = 'SELECT * FROM restaurant';
 
@@ -28,6 +28,10 @@ class RestaurantModel extends BaseModel
             }
             $query = preg_replace('/ AND$/', '', $query);
         }
+
+        $calc_page = ($page_num - 1) * $page_size;
+        $where = str_contains($query, 'WHERE') ? '' : ' WHERE';
+        $query .= "$where restaurant_id > $calc_page ORDER BY restaurant_id ASC LIMIT $page_size";
 
         return $this->fetchAll($query, $filters);
     }
