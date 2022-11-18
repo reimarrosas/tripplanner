@@ -30,8 +30,7 @@ class RestaurantModel extends BaseModel
         }
 
         $calc_page = ($page_num - 1) * $page_size;
-        $where = str_contains($query, 'WHERE') ? '' : ' WHERE';
-        $query .= "$where restaurant_id > $calc_page ORDER BY restaurant_id ASC LIMIT $page_size";
+        $query .= " ORDER BY restaurant_id ASC LIMIT $page_size OFFSET $calc_page";
 
         return $this->fetchAll($query, $filters);
     }
