@@ -12,6 +12,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 //var_dump($_SERVER["REQUEST_METHOD"]);
 use Slim\Factory\AppFactory;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
+use app\exceptions\HttpNotAcceptableException;
 
 require __DIR__ . '/vendor/autoload.php';
 
