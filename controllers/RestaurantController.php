@@ -95,38 +95,51 @@ class RestaurantController
         return $response->withStatus(201);
     }
 
-    // Route: /restaurants/{restaurant_id}
+    // Route: /restaurants
     public function updateRestaurant(Request $request, Response $response, array $args): Response
     {
-        $id = $args['restaurant_id'] ?? false;
-        $int_id = intval($id);
-        if (!ctype_digit($id)) {
-            throw new HttpUnprocessableEntityException($request, 'Restaurant ID invalid!');
-        }
-
         $body = $request->getParsedBody();
-        $validation = $this->validateRestaurant($body);
 
-        if (!empty($validation)) {
-            throw new HttpUnprocessableEntityException($request, $validation);
+        if (!is_array($body)) {
+            throw new HttpUnprocessableEntityException($request, 'Request body must be a valid JSON object.');
         }
 
-        $body = $this->remapBody($body);
-        try {
-            $restaurant_model = new RestaurantModel();
+        $count = count($body);
 
-            if (empty($restaurant_model->getSingleRestaurant($int_id))) {
-                throw new HttpNotFoundException($request, "Restaurant $int_id does not exist!");
+        if ($count == 0) {
+            throw new HttpUnprocessableEntityException($request, 'Request body must not be empty.');
+        }
+
+        for ($i = 0; $i < $count; ++$i) {
+            $restaurant = $body[$i] ?? false;
+
+            $validation = '';
+
+            $restaurant_id = $restaurant['restaurant_id'] ?? false;
+            if ($restaurant_id === false || !is_int($restaurant_id) || $restaurant_id < 1) {
+                $validation = 'Restaurant ID must be an integer > 0';
+            } else {
+                $validation = $this->validateRestaurant($restaurant);
             }
 
-            $restaurant_model->updateSingleRestaurant($int_id, $body);
+            if (!empty($validation)) {
+                throw new HttpUnprocessableEntityException($request, "$validation with restaurant on index $i.");
+            }
+
+            $body[$i] = $this->remapBody($body[$i]);
+            $body[$i]['restaurant_id'] = $restaurant_id;
+        }
+
+        try {
+            $restaurant_model = new RestaurantModel();
+            $restaurant_model->updateMultipleRestaurant($body);
         } catch (HttpNotFoundException $ex) {
             throw $ex;
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
 
-        $response->getBody()->write(json_encode(['message' => "Restaurant $int_id update successful!"]));
+        $response->getBody()->write(json_encode(['message' => "Restaurant update(s) successful!"]));
         return $response;
     }
 

@@ -58,7 +58,8 @@ class RestaurantModel extends BaseModel
             'VALUES ' .
             '(:location_fk, :name, :price_min, :accessibility, :charging_station, :street, :price_max)';
 
-        $stmt = $this->getPdo()->prepare($query);
+        $db = $this->getPdo();
+        $stmt = $db->prepare($query);
         $stmt->bindParam('location_fk', $location_fk);
         $stmt->bindParam('name', $name);
         $stmt->bindParam('price_min', $price_min);
@@ -67,11 +68,21 @@ class RestaurantModel extends BaseModel
         $stmt->bindParam('street', $street);
         $stmt->bindParam('price_max', $price_max);
 
-        foreach ($restaurants as $restaurant) {
-            extract($restaurant);
-            $stmt->execute();
-            $count++;
+        try {
+            $db->beginTransaction();
+
+            foreach ($restaurants as $restaurant) {
+                extract($restaurant);
+                $stmt->execute();
+                $count++;
+            }
+
+            $db->commit();
+        } catch (\Throwable $th) {
+            $db->rollBack();
+            throw $th;
         }
+
 
         return $count;
     }
@@ -90,6 +101,50 @@ class RestaurantModel extends BaseModel
             'price_max = :price_max ' .
             'WHERE restaurant_id = :restaurant_id';
         return $this->execute($query, $restaurant);
+    }
+
+    public function updateMultipleRestaurant(array $restaurants): int
+    {
+        $count = 0;
+
+        $query =
+            'UPDATE restaurant ' .
+            'SET location_fk = :location_fk, ' .
+            'name = :name, ' .
+            'price_min = :price_min, ' .
+            'accessibility = :accessibility, ' .
+            'charging_station = :charging_station, ' .
+            'street = :street, ' .
+            'price_max = :price_max ' .
+            'WHERE restaurant_id = :restaurant_id';
+
+        $db = $this->getPdo();
+        $stmt = $db->prepare($query);
+        $stmt->bindParam('location_fk', $location_fk);
+        $stmt->bindParam('name', $name);
+        $stmt->bindParam('price_min', $price_min);
+        $stmt->bindParam('accessibility', $accessibility);
+        $stmt->bindParam('charging_station', $charging_station);
+        $stmt->bindParam('street', $street);
+        $stmt->bindParam('price_max', $price_max);
+        $stmt->bindParam('restaurant_id', $restaurant_id);
+
+        try {
+            $db->beginTransaction();
+
+            foreach ($restaurants as $restaurant) {
+                extract($restaurant);
+                $stmt->execute();
+                $count++;
+            }
+
+            $db->commit();
+        } catch (\Throwable $th) {
+            $db->rollBack();
+            throw $th;
+        }
+
+        return $count;
     }
 
     public function deleteRestaurant(int $id): int
