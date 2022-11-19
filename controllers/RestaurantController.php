@@ -79,19 +79,14 @@ class RestaurantController
             $body[$i] = $this->remapBody($body[$i]);
         }
 
-        $result = 0;
         try {
             $restaurant_model = new RestaurantModel();
-            $result = $restaurant_model->createMultipleRestaurant($body);
+            $restaurant_model->createMultipleRestaurant($body);
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
 
-        if ($result < 1) {
-            throw new HttpInternalServerErrorException($request, 'Restaurant creation unsuccessful!');
-        }
-
-        $response->getBody()->write(json_encode(['message' => 'Restaurant creation successful!']));
+        $response->getBody()->write(json_encode(['message' => 'Restaurant/s creation successful!']));
         return $response->withStatus(201);
     }
 

@@ -73,8 +73,47 @@ class FoodModel extends BaseModel
             'type = :type, ' .
             'name = :name, ' .
             'price = :price ' .
-            'WHERE food_id = :food_id';
+            'WHERE food_id = :food_id AND restaurant_fk = :old_restaurant_fk';
         return $this->execute($query, $food);
+    }
+
+    public function updateMultipleFood(array $foods): int
+    {
+        $count = 0;
+
+        $query =
+            'UPDATE food ' .
+            'SET restaurant_fk = :restaurant_fk, ' .
+            'type = :type, ' .
+            'name = :name, ' .
+            'price = :price ' .
+            'WHERE food_id = :food_id AND restaurant_fk = :old_restaurant_fk';
+
+        $db = $this->getPdo();
+        $stmt = $db->prepare($query);
+        $stmt->bindParam('restaurant_fk', $restaurant_fk);
+        $stmt->bindParam('type', $type);
+        $stmt->bindParam('name', $name);
+        $stmt->bindParam('price', $price);
+        $stmt->bindParam('food_id', $food_id);
+        $stmt->bindParam('old_restaurant_fk', $old_restaurant_fk);
+
+        try {
+            $db->beginTransaction();
+
+            foreach ($foods as $food) {
+                extract($food);
+                $stmt->execute();
+                $count++;
+            }
+
+            $db->commit();
+        } catch (\Throwable $th) {
+            $db->rollBack();
+            throw $th;
+        }
+
+        return $count;
     }
 
     public function deleteFood(int $restaurant_fk, int $food_id): int
