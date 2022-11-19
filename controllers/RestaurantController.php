@@ -18,7 +18,7 @@ class RestaurantController
         $query_params = $request->getQueryParams();
         $filters = $this->parseRestaurantFilters($query_params);
         $page_num = $query_params['page'] ?? '1';
-        $page_size = $query_params['page_size'] ?? '3';
+        $page_size = $query_params['page_size'] ?? '4';
         
         if (!ctype_digit($page_num) || intval($page_num) < 1) {
             throw new HttpUnprocessableEntityException($request, 'Page Number should be an integer > 0!');
