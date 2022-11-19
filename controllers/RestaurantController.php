@@ -57,22 +57,37 @@ class RestaurantController
     public function createRestaurant(Request $request, Response $response, array $args): Response
     {
         $body = $request->getParsedBody();
-        $validation = $this->validateRestaurant($body);
 
-        if (!empty($validation)) {
-            throw new HttpUnprocessableEntityException($request, $validation);
+        if (!is_array($body)) {
+            throw new HttpUnprocessableEntityException($request, 'Request body must be a valid JSON object.');
+        }
+
+        $count = count($body);
+
+        if ($count == 0) {
+            throw new HttpUnprocessableEntityException($request, 'Request body must not be empty.');
+        }
+
+        for ($i = 0; $i < $count; ++$i) {
+            $restaurant = $body[$i] ?? false;
+            $validation = $this->validateRestaurant($restaurant);
+
+            if (!empty($validation)) {
+                throw new HttpUnprocessableEntityException($request, "$validation with restaurant on index $i.");
+            }
+
+            $body[$i] = $this->remapBody($body[$i]);
         }
 
         $result = 0;
-
         try {
             $restaurant_model = new RestaurantModel();
-            $result = $restaurant_model->createSingleRestaurant($body);
+            $result = $restaurant_model->createMultipleRestaurant($body);
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
 
-        if ($result !== 1) {
+        if ($result < 1) {
             throw new HttpInternalServerErrorException($request, 'Restaurant creation unsuccessful!');
         }
 

@@ -48,6 +48,34 @@ class RestaurantModel extends BaseModel
         return $this->execute($query, $restaurant);
     }
 
+    public function createMultipleRestaurant(array $restaurants): int
+    {
+        $count = 0;
+
+        $query =
+            'INSERT INTO restaurant ' .
+            '(location_fk, name, price_min, accessibility, charging_station, street, price_max) ' .
+            'VALUES ' .
+            '(:location_fk, :name, :price_min, :accessibility, :charging_station, :street, :price_max)';
+
+        $stmt = $this->getPdo()->prepare($query);
+        $stmt->bindParam('location_fk', $location_fk);
+        $stmt->bindParam('name', $name);
+        $stmt->bindParam('price_min', $price_min);
+        $stmt->bindParam('accessibility', $accessibility);
+        $stmt->bindParam('charging_station', $charging_station);
+        $stmt->bindParam('street', $street);
+        $stmt->bindParam('price_max', $price_max);
+
+        foreach ($restaurants as $restaurant) {
+            extract($restaurant);
+            $stmt->execute();
+            $count++;
+        }
+
+        return $count;
+    }
+
     public function updateSingleRestaurant(int $restaurant_id, array $restaurant): int
     {
         $restaurant['restaurant_id'] = $restaurant_id;
