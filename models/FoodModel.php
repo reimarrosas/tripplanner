@@ -30,6 +30,41 @@ class FoodModel extends BaseModel
         return $this->execute($query, $food);
     }
 
+    public function createMultipleFood(array $foods): int
+    {
+        $count = 0;
+
+        $query =
+            'INSERT INTO food ' .
+            '(restaurant_fk, type, name, price) ' .
+            'VALUES ' .
+            '(:restaurant_fk, :type, :name, :price)';
+
+        $db = $this->getPdo();
+        $stmt = $db->prepare($query);
+        $stmt->bindParam('restaurant_fk', $restaurant_fk);
+        $stmt->bindParam('type', $type);
+        $stmt->bindParam('name', $name);
+        $stmt->bindParam('price', $price);
+
+        try {
+            $db->beginTransaction();
+
+            foreach ($foods as $food) {
+                extract($food);
+                $stmt->execute();
+                $count++;
+            }
+
+            $db->commit();
+        } catch (\Throwable $th) {
+            $db->rollBack();
+            throw $th;
+        }
+
+        return $count;
+    }
+
     public function updateSingleFood(array $food): int
     {
         $query =

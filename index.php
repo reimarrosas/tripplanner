@@ -67,7 +67,7 @@ $app->delete('/restaurants/{restaurant_id}', [RestaurantController::class, 'dele
 $app->get('/restaurants/{restaurant_id}/food', [FoodController::class, 'getAllFood']);
 $app->get('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'getSingleFood']);
 $app->post('/restaurants/{restaurant_id}/food', [FoodController::class, 'createFood']);
-$app->put('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'updateFood']);
+$app->put('/restaurants/{restaurant_id}/food', [FoodController::class, 'updateFood']);
 $app->delete('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'deleteFood']);
 $app->get('/locations', [LocationController::class, 'getLocations']);
 $app->get('/locations/{location_id}', [LocationController::class, 'getLocation']);

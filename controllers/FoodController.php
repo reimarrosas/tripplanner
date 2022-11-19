@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\exceptions\HttpUnprocessableEntityException;
 use app\models\FoodModel;
+use app\models\RestaurantModel;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Exception\HttpInternalServerErrorException;
@@ -65,29 +66,55 @@ class FoodController
         return $response;
     }
 
-    // Route: /restaurants/{restaurant_id}
+    // Route: /restaurants/{restaurant_id}/food
     public function createFood(Request $request, Response $response, $args): Response
     {
-        $body = $request->getParsedBody();
-        $body['restaurant_fk'] = intval($args['restaurant_id'] ?? '');
-        $validation = $this->validateFood($body);
-
-        if (!empty($validation)) {
-            throw new HttpUnprocessableEntityException($request, $validation);
+        $restaurant_id = intval($args['restaurant_id'] ?? '');
+        if ($restaurant_id < 1) {
+            throw new HttpUnprocessableEntityException($request, '`restaurant_fk` must be an integer > 0');
         }
 
-        $food = $this->remapBody($body);
-
-        $result = 0;
+        $restaurant = [];
         try {
-            $food_model = new FoodModel();
-            $result = $food_model->createSingleFood($food);
+            $restaurant_model = new RestaurantModel();
+            $restaurant = $restaurant_model->getSingleRestaurant($restaurant_id);
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
 
-        if ($result !== 1) {
-            throw new HttpInternalServerErrorException($request, 'Restaurant creation unsuccessful!');
+        if (empty($restaurant)) {
+            throw new HttpNotFoundException($request, "Restaurant $restaurant_id not found!");
+        }
+
+        $body = $request->getParsedBody();
+
+        if (!is_array($body)) {
+            throw new HttpUnprocessableEntityException($request, 'Request body must be a valid JSON object.');
+        }
+
+        $count = count($body);
+
+        if ($count == 0) {
+            throw new HttpUnprocessableEntityException($request, 'Request body must not be empty.');
+        }
+
+        for ($i = 0; $i < $count; ++$i) {
+            $food = $body[$i] ?? false;
+            $validation = $this->validateFood($food);
+
+            if (!empty($validation)) {
+                throw new HttpUnprocessableEntityException($request, "$validation with food on index $i.");
+            }
+
+            $food['restaurant_fk'] = $restaurant_id;
+            $body[$i] = $this->remapBody($food);
+        }
+
+        try {
+            $food_model = new FoodModel();
+            $food_model->createMultipleFood($body);
+        } catch (\Throwable $th) {
+            throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
 
         $response->getBody()->write(json_encode(['message' => 'Restaurant creation successful!']));
@@ -128,7 +155,7 @@ class FoodController
             }
 
             $food_model->updateSingleFood($food);
-        } catch(HttpNotFoundException $ex) {
+        } catch (HttpNotFoundException $ex) {
             throw $ex;
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
@@ -194,8 +221,6 @@ class FoodController
 
         if (empty($food)) {
             $ret = 'Request must contain restaurant_fk, type, name, and price';
-        } else if (!array_key_exists('restaurant_fk', $food) || !is_int($food['restaurant_fk']) || $food['restaurant_fk'] < 1) {
-            $ret = '`restaurant_fk` must be an integer > 0';
         } else if (!array_key_exists('type', $food) || !is_string($food['type']) || empty($food['type'])) {
             $ret = '`type` must be a non-empty string';
         } else if (!array_key_exists('name', $food) || !is_string($food['name']) || empty($food['name'])) {
