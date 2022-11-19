@@ -5,6 +5,8 @@ use app\controllers\RestaurantController;
 use app\controllers\LocationController;
 use app\controllers\HotelController;
 use app\controllers\AttractionController;
+use app\controllers\CarRentalController;
+
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 //var_dump($_SERVER["REQUEST_METHOD"]);
@@ -70,22 +72,32 @@ $app->get('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class,
 $app->post('/restaurants/{restaurant_id}/food', [FoodController::class, 'createFood']);
 $app->put('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'updateFood']);
 $app->delete('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'deleteFood']);
+// Locations routes
 $app->get('/locations', [LocationController::class, 'getLocations']);
 $app->get('/locations/{location_id}', [LocationController::class, 'getLocation']);
 $app->delete('/locations/{location_id}', [LocationController::class, 'deleteLocation']);
 $app->post('/locations', [LocationController::class, 'createLocation']);
 $app->put('/locations', [LocationController::class, 'updateLocation']);
 $app->get('/locations/{location_id}/climate', [LocationController::class, 'getClimate']);
+// Hotels routes
 $app->get('/hotels', [HotelController::class, 'getHotels']);
 $app->get('/hotels/{hotel_id}', [HotelController::class, 'gethotel']);
 $app->delete('/hotels/{hotel_id}', [HotelController::class, 'deleteHotel']);
 $app->post('/hotels', [HotelController::class, 'createHotel']);
 $app->put('/hotels', [HotelController::class, 'updateHotel']);
+// Attractions routes
 $app->get('/attractions', [AttractionController::class, 'getAttractions']);
 $app->get('/attractions/{attraction_id}', [AttractionController::class, 'getAttraction']);
 $app->delete('/attractions/{attraction_id}', [AttractionController::class, 'deleteAttraction']);
 $app->post('/attractions', [AttractionController::class, 'createAttraction']);
 $app->put('/attractions', [AttractionController::class, 'updateAttraction']);
+// Car Rentals routes
+$app->get('/carrentals', [CarRentalController::class, 'getCarRentals']);
+$app->get('/carrentals/{car_rental_id}', [CarRentalController::class, 'getCarRental']);
+$app->post('/carrentals', [CarRentalController::class, 'createCarRental']);
+$app->put('/carrentals/{car_rental_id}', [CarRentalController::class, 'updateCarRental']);
+$app->delete('/carrentals/{car_rental_id}', [CarRentalController::class, 'deleteCarRental']);
+// Car routes
 
 // Run the app.
 $app->run();
