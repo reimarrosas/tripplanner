@@ -26,27 +26,24 @@ class CarRentalModel extends BaseModel
     }
 
     // Creating a car rental
-    public function createCarRental(array $car_rental): int
+    public function createCarRental($data)
     {
-        $query =
-            'INSERT INTO car_rental ' .
-            '(location_fk, price_range, rental_duration, street) ' .
-            'VALUES ' .
-            '(:location, :price, :duration, :street)';
-        return $this->execute($query, $car_rental);
+        $data = $this->insert("car_rental", $data);
+        return $data;
     }
 
     // Updating car rental 
-    public function updateCarRental(array $car_rental): int
+    public function updateCarRental(int $car_rental_id, array $car_rental): int
     {
-        $query = 'UPDATE car_rental SET';
-        foreach ($car_rental as $key => $val) {
-            if ($key != 'car_rental_id') {
-                $query .= " $key = :$key,";
-            }
-        }
-        $query = rtrim($query, ',') . ' WHERE car_rental_id = :car_rental_id';
-
+        $car_rental['car_rental_id'] = $car_rental_id;
+        $query =
+            'UPDATE car_rental ' .
+            'SET location_fk = :location_fk, ' .
+            'price_min = :price_min, ' .
+            'rental_duration = :rental_duration, ' .
+            'street = :street, ' .
+            'price_max = :price_max ' .
+            'WHERE car_rental_id = :car_rental_id';
         return $this->execute($query, $car_rental);
     }
 

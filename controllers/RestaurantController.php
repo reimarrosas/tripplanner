@@ -7,21 +7,28 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 use app\models\RestaurantModel;
-use Exception;
 use Slim\Exception\HttpInternalServerErrorException;
 use Slim\Exception\HttpNotFoundException;
 
 class RestaurantController
 {
     // Route: /restaurants
-    // TODO: Pagination
     public function getRestaurants(Request $request, Response $response, array $args): Response
     {
         $query_params = $request->getQueryParams();
         $filters = $this->parseRestaurantFilters($query_params);
+        $page_num = $query_params['page'] ?? '1';
+        $page_size = $query_params['page_size'] ?? '4';
+        
+        if (!ctype_digit($page_num) || intval($page_num) < 1) {
+            throw new HttpUnprocessableEntityException($request, 'Page Number should be an integer > 0!');
+        } else if (!ctype_digit($page_size) || intval($page_size) < 1) {
+            throw new HttpUnprocessableEntityException($request, 'Page Size should be an integer > 0!');
+        }
+
         try {
             $restaurant_model = new RestaurantModel();
-            $result = $restaurant_model->getAllRestaurants($filters);
+            $result = $restaurant_model->getAllRestaurants($filters, $page_num, $page_size);
             $response->getBody()->write(json_encode($result));
             return $response;
         } catch (\Throwable $th) {
@@ -57,61 +64,84 @@ class RestaurantController
     public function createRestaurant(Request $request, Response $response, array $args): Response
     {
         $body = $request->getParsedBody();
-        $validation = $this->validateRestaurant($body);
 
-        if (!empty($validation)) {
-            throw new HttpUnprocessableEntityException($request, $validation);
+        if (!is_array($body)) {
+            throw new HttpUnprocessableEntityException($request, 'Request body must be a valid JSON object.');
         }
 
-        $result = 0;
+        $count = count($body);
+
+        if ($count == 0) {
+            throw new HttpUnprocessableEntityException($request, 'Request body must not be empty.');
+        }
+
+        for ($i = 0; $i < $count; ++$i) {
+            $restaurant = $body[$i] ?? false;
+            $validation = $this->validateRestaurant($restaurant);
+
+            if (!empty($validation)) {
+                throw new HttpUnprocessableEntityException($request, "$validation with restaurant on index $i.");
+            }
+
+            $body[$i] = $this->remapBody($body[$i]);
+        }
 
         try {
             $restaurant_model = new RestaurantModel();
-            $result = $restaurant_model->createSingleRestaurant($body);
+            $restaurant_model->createMultipleRestaurant($body);
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
 
-        if ($result !== 1) {
-            throw new HttpInternalServerErrorException($request, 'Restaurant creation unsuccessful!');
-        }
-
-        $response->getBody()->write(json_encode(['message' => 'Restaurant creation successful!']));
+        $response->getBody()->write(json_encode(['message' => 'Restaurant/s creation successful!']));
         return $response->withStatus(201);
     }
 
-    // Route: /restaurants/{restaurant_id}
+    // Route: /restaurants
     public function updateRestaurant(Request $request, Response $response, array $args): Response
     {
-        $id = $args['restaurant_id'] ?? false;
-        $int_id = intval($id);
-        if (!ctype_digit($id)) {
-            throw new HttpUnprocessableEntityException($request, 'Restaurant ID invalid!');
-        }
-
         $body = $request->getParsedBody();
-        $validation = $this->validateRestaurant($body);
 
-        if (!empty($validation)) {
-            throw new HttpUnprocessableEntityException($request, $validation);
+        if (!is_array($body)) {
+            throw new HttpUnprocessableEntityException($request, 'Request body must be a valid JSON object.');
         }
 
-        $body = $this->remapBody($body);
-        try {
-            $restaurant_model = new RestaurantModel();
+        $count = count($body);
 
-            if (empty($restaurant_model->getSingleRestaurant($int_id))) {
-                throw new HttpNotFoundException($request, "Restaurant $int_id does not exist!");
+        if ($count == 0) {
+            throw new HttpUnprocessableEntityException($request, 'Request body must not be empty.');
+        }
+
+        for ($i = 0; $i < $count; ++$i) {
+            $restaurant = $body[$i] ?? false;
+
+            $validation = '';
+
+            $restaurant_id = $restaurant['restaurant_id'] ?? false;
+            if ($restaurant_id === false || !is_int($restaurant_id) || $restaurant_id < 1) {
+                $validation = 'Restaurant ID must be an integer > 0';
+            } else {
+                $validation = $this->validateRestaurant($restaurant);
             }
 
-            $restaurant_model->updateSingleRestaurant($int_id, $body);
+            if (!empty($validation)) {
+                throw new HttpUnprocessableEntityException($request, "$validation with restaurant on index $i.");
+            }
+
+            $body[$i] = $this->remapBody($body[$i]);
+            $body[$i]['restaurant_id'] = $restaurant_id;
+        }
+
+        try {
+            $restaurant_model = new RestaurantModel();
+            $restaurant_model->updateMultipleRestaurant($body);
         } catch (HttpNotFoundException $ex) {
             throw $ex;
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
 
-        $response->getBody()->write(json_encode(['message' => "Restaurant $int_id update successful!"]));
+        $response->getBody()->write(json_encode(['message' => "Restaurant update(s) successful!"]));
         return $response;
     }
 
@@ -153,10 +183,10 @@ class RestaurantController
             $ret['name'] = "%$name%";
         }
         if ($price_max !== false) {
-            $ret['price_max'] = $price_max;
+            $ret['price_max'] = floatval($price_max);
         }
         if ($price_min !== false) {
-            $ret['price_min'] = $price_min;
+            $ret['price_min'] = floatval($price_min);
         }
         if ($accessibility !== false) {
             $ret['accessibility'] = $accessibility;
