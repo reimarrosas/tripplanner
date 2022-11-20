@@ -17,10 +17,10 @@ class AttractionModel extends BaseModel {
 
     /**
      * Retrieve all attraction from the `attraction` table. It also filters based on name, maximun price, minimum price, parking
-     * and charging stations.
+     * and charging stations. Also there is the option of pagination
      * @return array A list of attraction. 
      */
-    public function getAllAttractions(array $filters): array {
+    public function getAllAttractions(array $filters, $page_num, $page_size): array {
         $query = 'SELECT * FROM attraction';
 
         if (!empty($filters)) {
@@ -42,7 +42,9 @@ class AttractionModel extends BaseModel {
             }
             $query = preg_replace('/ AND$/', '', $query);
         }
-        
+        $calc_page = ($page_num - 1) * $page_size;
+        $query .= " ORDER BY attraction_id ASC LIMIT $page_size OFFSET $calc_page";
+
         return $this->fetchAll($query, $filters);
     }
     
