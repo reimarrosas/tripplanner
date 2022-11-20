@@ -6,6 +6,8 @@ use app\controllers\LocationController;
 use app\controllers\HotelController;
 use app\controllers\AttractionController;
 use app\controllers\CarRentalController;
+use app\controllers\CarController;
+
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -98,6 +100,11 @@ $app->post('/carrentals', [CarRentalController::class, 'createCarRental']);
 $app->put('/carrentals/{car_rental_id}', [CarRentalController::class, 'updateCarRental']);
 $app->delete('/carrentals/{car_rental_id}', [CarRentalController::class, 'deleteCarRental']);
 // Car routes
+$app->get('/carrentals/{car_rental_id}/cars', [CarController::class, 'getCars']);
+$app->get('/carrentals/{car_rental_id}/cars/{car_id}', [CarController::class, 'getCar']);
+$app->post('/carrentals/cars', [CarController::class, 'createCar']);
+$app->put('/carrentals/{car_rental_id}/cars/{car_id}', [CarController::class, 'updateCar']);
+$app->delete('/carrentals/{car_rental_id}/cars/{car_id}', [CarController::class, 'deleteCar']);
 
 // Run the app.
 $app->run();
