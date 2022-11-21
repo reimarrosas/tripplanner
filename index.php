@@ -8,6 +8,7 @@ use app\controllers\AttractionController;
 use app\controllers\CarRentalController;
 use app\controllers\CarController;
 
+
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 //var_dump($_SERVER["REQUEST_METHOD"]);
@@ -65,14 +66,14 @@ $app->get('/hello', function (Request $request, Response $response, $args) {
 $app->get('/restaurants', [RestaurantController::class, 'getRestaurants']);
 $app->get('/restaurants/{restaurant_id}', [RestaurantController::class, 'getRestaurant']);
 $app->post('/restaurants', [RestaurantController::class, 'createRestaurant']);
-$app->put('/restaurants/{restaurant_id}', [RestaurantController::class, 'updateRestaurant']);
+$app->put('/restaurants', [RestaurantController::class, 'updateRestaurant']);
 $app->delete('/restaurants/{restaurant_id}', [RestaurantController::class, 'deleteRestaurant']);
 $app->get('/restaurants/{restaurant_id}/reviews', [RestaurantController::class, 'getReviews']);
 // Food routes
 $app->get('/restaurants/{restaurant_id}/food', [FoodController::class, 'getAllFood']);
 $app->get('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'getSingleFood']);
 $app->post('/restaurants/{restaurant_id}/food', [FoodController::class, 'createFood']);
-$app->put('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'updateFood']);
+$app->put('/restaurants/{restaurant_id}/food', [FoodController::class, 'updateFood']);
 $app->delete('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'deleteFood']);
 // Locations routes
 $app->get('/locations', [LocationController::class, 'getLocations']);

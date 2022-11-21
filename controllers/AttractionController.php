@@ -18,9 +18,18 @@ class AttractionController
     {
         $query_params = $request->getQueryParams();
         $filters = $this->parseAttractionFilters($query_params);
+        $page_num = $query_params['page'] ?? '1';
+        $page_size = $query_params['page_size'] ?? '4';
+
+        if(!ctype_digit($page_num) || intval($page_num) < 1) {
+            throw new HttpUnprocessableEntityException($request, 'Page Number should be an integer > 0!');
+        } else if (!ctype_digit($page_size) || intval($page_size) < 1) {
+            throw new HttpUnprocessableEntityException($request, 'Page Size should be an integer > 0!');
+        }
+
         try {
             $attraction_model = new AttractionModel();
-            $result = $attraction_model->getAllAttractions($filters);
+            $result = $attraction_model->getAllAttractions($filters, $page_num, $page_size);
             $response->getBody()->write(json_encode($result));
             return $response;
         } catch (\Throwable $th) {
