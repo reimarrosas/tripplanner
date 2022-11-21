@@ -68,6 +68,7 @@ $app->get('/restaurants/{restaurant_id}', [RestaurantController::class, 'getRest
 $app->post('/restaurants', [RestaurantController::class, 'createRestaurant']);
 $app->put('/restaurants', [RestaurantController::class, 'updateRestaurant']);
 $app->delete('/restaurants/{restaurant_id}', [RestaurantController::class, 'deleteRestaurant']);
+$app->get('/restaurants/{restaurant_id}/reviews', [RestaurantController::class, 'getReviews']);
 // Food routes
 $app->get('/restaurants/{restaurant_id}/food', [FoodController::class, 'getAllFood']);
 $app->get('/restaurants/{restaurant_id}/food/{food_id}', [FoodController::class, 'getSingleFood']);
