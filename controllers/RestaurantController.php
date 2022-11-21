@@ -5,8 +5,8 @@ namespace app\controllers;
 use app\exceptions\HttpUnprocessableEntityException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-
 use app\models\RestaurantModel;
+use GuzzleHttp\Client;
 use Slim\Exception\HttpInternalServerErrorException;
 use Slim\Exception\HttpNotFoundException;
 
@@ -215,5 +215,56 @@ class RestaurantController
             'street' => $body['street'],
             'price_max' => $body['price_max']
         ];
+    }
+
+    // Route: /restaurants/{restaurant_id}/reviews
+    public function getReviews(Request $request, Response $response, array $args): Response
+    {
+        $restaurant_id = $args['restaurant_id'] ?? '';
+        $int_restaurant_id = intval($restaurant_id);
+
+        if (!ctype_digit($restaurant_id) || $int_restaurant_id < 1) {
+            throw new HttpUnprocessableEntityException($request, '`restaurant_id` must be an integer > 0');
+        }
+
+        $restaurant = [];
+        try {
+            $restaurant_model = new RestaurantModel();
+            $restaurant = $restaurant_model->getSingleRestaurant($int_restaurant_id);
+        } catch (\Throwable $th) {
+            throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
+        }
+
+        if (empty($restaurant)) {
+            throw new HttpNotFoundException($request, "Restaurant $restaurant_id not found!");
+        }
+
+        $client = new Client(['base_uri' => 'https://api.yelp.com/v3/businesses/']);
+
+        $api_key = "ZZfwCoUi9QtvAAEIcKQmkRwNzBpX5QqBA5jccNncXXP6AcdsMclL2jJFSHmUzWCp93sdtN9zXAh0TW-JPYI_nH9oHCtekB698KzQ0v6ic3Kwyo1VgD-dGdms_Nx7Y3Yx";
+        $term = $restaurant['name'];
+        $location = $restaurant['street'];
+       
+        $reviews = [];
+        try {
+            $headers = [
+                'Authorization' => 'Bearer ' . $api_key       
+            ];
+            $res = $client->get("search?term=$term&location=$location", ['headers' => $headers]);
+            $body = json_decode($res->getBody());
+            $id = $body->businesses[0]->id;
+            $res = $client->get("$id/reviews", ['headers' => $headers]);
+            $reviews = json_decode($res->getBody());
+        } catch (\Throwable $th) {
+            throw new HttpInternalServerErrorException($request, $th);
+        }
+
+        $response_body = [
+            'term' => $term,
+            'location' => $location,
+            'reviews' => $reviews
+        ];
+        $response->getBody()->write(json_encode($response_body));
+        return $response;
     }
 }
