@@ -1,7 +1,7 @@
 <?php
 
 namespace app\controllers;
-
+use app\config\APIKeys;
 use app\exceptions\HttpUnprocessableEntityException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -264,7 +264,7 @@ class RestaurantController
 
         $client = new Client(['base_uri' => 'https://api.yelp.com/v3/businesses/']);
 
-        $api_key = "ZZfwCoUi9QtvAAEIcKQmkRwNzBpX5QqBA5jccNncXXP6AcdsMclL2jJFSHmUzWCp93sdtN9zXAh0TW-JPYI_nH9oHCtekB698KzQ0v6ic3Kwyo1VgD-dGdms_Nx7Y3Yx";
+        $api_key = APIKeys::REVIEWS;
         $term = $restaurant['name'];
         $location = $restaurant['street'];
        
