@@ -10,11 +10,14 @@ class CarModel extends BaseModel
     }
 
     // Getting all cars 
-    public function getAllCars(int $car_rental_fk): array
+    public function getAllCars(int $car_rental_fk, $page_num, $page_size): array
     {
         $query = 'SELECT * FROM car WHERE car_rental_fk = :car_rental_fk';
+        $calc_page = ($page_num - 1) * $page_size;
+        $query .= " ORDER BY car_id ASC LIMIT $page_size OFFSET $calc_page";
         return $this->fetchAll($query, ['car_rental_fk' => $car_rental_fk]);
     }
+
 
     // Getting a car by id 
     public function getCarById(int $car_rental_fk, int $car_id): array
