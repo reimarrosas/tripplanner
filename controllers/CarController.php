@@ -23,10 +23,20 @@ class CarController
             throw new HttpUnprocessableEntityException($request, 'Car Rental ID must be an integer > 0');
         }
 
+        $query_params = $request->getQueryParams();
+        $page_num = $query_params['page'] ?? '1';
+        $page_size = $query_params['page_size'] ?? '4';
+
+        if(!ctype_digit($page_num) || intval($page_num) < 1) {
+            throw new HttpUnprocessableEntityException($request, 'Page Number should be an integer > 0!');
+        } else if (!ctype_digit($page_size) || intval($page_size) < 1) {
+            throw new HttpUnprocessableEntityException($request, 'Page Size should be an integer > 0!');
+        }
+
         $result = [];
         try {
             $car_model = new CarModel();
-            $result = $car_model->getAllCars($int_car_rental_id);
+            $result = $car_model->getAllCars($int_car_rental_id, $page_num, $page_size);
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
