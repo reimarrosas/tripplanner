@@ -236,10 +236,9 @@ class HotelController
             throw new HttpUnprocessableEntityException($request, '`hotel_id` must be an integer > 0');
         }
 
-        $restaurant = [];
         try {
             $hotel_model = new HotelModel();
-            $hotel = $hotel_model->getSingleHotel($int_hotel_id);
+            $hotel = $hotel_model->getHotelLocation($int_hotel_id);
            // var_dump($attraction);
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
@@ -253,7 +252,7 @@ class HotelController
 
         $api_key = APIKeys::REVIEWS;
         $term = $hotel['name'];
-        $location = $hotel['Street'];
+        $location = $hotel['city'] . ',' . $hotel['country'];
 
         $reviews = [];
         try {

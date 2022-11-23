@@ -58,6 +58,18 @@ class HotelModel extends BaseModel {
         return $data;
     }
 
+    /**
+     * 2. Get the details of a given hotel
+     * @param int $hotelId the id of the location.
+     * @return array an array containing information about a given hotel.
+     */
+    public function getHotelLocation($hotelId) {
+        $sql = "SELECT hotel.*, location.* FROM hotel JOIN location ON location.location_id=hotel.location_fk WHERE hotel_id = ? ";
+        $data = $this->run($sql, [$hotelId])->fetch();
+        
+        return $data;
+    }
+
      /**
      * Update information about one or more hotels (the /hotels resource collection must support this operations).
      */
