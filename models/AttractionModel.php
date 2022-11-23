@@ -60,6 +60,18 @@ class AttractionModel extends BaseModel {
         return $data;
     }
 
+    /**
+     * 2. Get the details of a given attraction.
+     * @param int $attractionId the id of the attraction.
+     * @return array an array containing information about a given attraction.
+     */
+    public function getAttractionLocation($attraction_id) {
+        $sql = "SELECT attraction.*, location.* FROM attraction JOIN location ON location.location_id=attraction.location_fk WHERE attraction_id = ? ";
+        $data = $this->run($sql, [$attraction_id])->fetch();
+        
+        return $data;
+    }
+
      /**
      * Update information about one or more attraction (the /attractionss resource collection must support this operations).
      */

@@ -246,10 +246,9 @@ class AttractionController
             throw new HttpUnprocessableEntityException($request, '`attraction_id` must be an integer > 0');
         }
 
-        $restaurant = [];
         try {
             $attraction_model = new AttractionModel();
-            $attraction = $attraction_model->getSingleAttraction($int_attraction_id);
+            $attraction = $attraction_model->getAttractionLocation($int_attraction_id);
            // var_dump($attraction);
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
@@ -263,7 +262,7 @@ class AttractionController
 
         $api_key = APIKeys::REVIEWS;
         $term = $attraction['name'];
-        $location = $attraction['street'];
+        $location = $attraction['city'] . ',' . $attraction['country'];
 
         $reviews = [];
         try {

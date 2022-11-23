@@ -250,10 +250,9 @@ class RestaurantController
             throw new HttpUnprocessableEntityException($request, '`restaurant_id` must be an integer > 0');
         }
 
-        $restaurant = [];
         try {
             $restaurant_model = new RestaurantModel();
-            $restaurant = $restaurant_model->getSingleRestaurant($int_restaurant_id);
+            $restaurant = $restaurant_model->getRestaurantLocation($int_restaurant_id);
         } catch (\Throwable $th) {
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
@@ -266,8 +265,8 @@ class RestaurantController
 
         $api_key = APIKeys::REVIEWS;
         $term = $restaurant['name'];
-        $location = $restaurant['street'];
-       
+        $location = $restaurant['city'] . ',' . $restaurant['country'];
+
         $reviews = [];
         try {
             $headers = [

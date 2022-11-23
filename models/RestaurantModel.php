@@ -41,6 +41,13 @@ class RestaurantModel extends BaseModel
         return $this->fetchSingle($query, ['restaurant_id' => $id]);
     }
 
+    public function getRestaurantLocation(int $id): array
+    {
+        $sql = "SELECT restaurant.*, location.* FROM restaurant JOIN location ON location.location_id=restaurant.location_fk WHERE restaurant_id = ? ";
+        $data = $this->run($sql, [$id])->fetch();
+        return $data;
+    }
+
     public function createSingleRestaurant(array $restaurant): int
     {
         $query =
