@@ -107,6 +107,7 @@ $app->put('/carrentals/{car_rental_id}/cars/{car_id}', [CarController::class, 'u
 $app->delete('/carrentals/{car_rental_id}/cars/{car_id}', [CarController::class, 'deleteCar']);
 // Recommendations
 $app->get('/recommendations', [RecommendationController::class, 'recommend']);
+$app->get('/recommendations/tags', [RecommendationController::class, 'getRecommendationTags']);
 
 // Run the app.
 $app->run();

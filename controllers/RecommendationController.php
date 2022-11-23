@@ -6,6 +6,7 @@ use app\exceptions\HttpUnprocessableEntityException;
 use app\models\AttractionModel;
 use app\models\HotelModel;
 use app\models\RestaurantModel;
+use app\models\TagModel;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Exception\HttpInternalServerErrorException;
@@ -42,8 +43,17 @@ class RecommendationController
         return $response;
     }
 
-    // private function validateFilters(mixed $filters): array
-    // {
-// 
-    // }
+    public function getRecommendationTags(Request $request, Response $response, array $args): Response
+    {
+        $tags = [];
+        try {
+            $tag_model = new TagModel();
+            $tags = $tag_model->getTags();
+        } catch (\Throwable $th) {
+            throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
+        }
+
+        $response->getBody()->write(json_encode($tags));
+        return $response;
+    }
 }
