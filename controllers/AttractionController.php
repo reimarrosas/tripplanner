@@ -9,6 +9,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use app\models\AttractionModel;
 use Slim\Exception\HttpInternalServerErrorException;
 use Slim\Exception\HttpNotFoundException;
+use GuzzleHttp\Client;
+use app\config\APIKeys;
 
 class AttractionController
 {
@@ -42,7 +44,7 @@ class AttractionController
     {
         $attraction_id = intval($args['attraction_id']);
         if ($attraction_id < 1) {
-            throw new HttpUnprocessableEntity($request, 'Attraction ID is not valid!');
+            throw new HttpUnprocessableEntityException($request, 'Attraction ID is not valid!');
         }
 
         $result = [];
@@ -66,7 +68,7 @@ class AttractionController
     {
         $attraction_id = intval($args['attraction_id']);
         if ($attraction_id < 1) {
-            throw new HttpUnprocessableEntity($request, 'Hotel ID is not valid!');
+            throw new HttpUnprocessableEntityException($request, 'Hotel ID is not valid!');
         }
 
         $result = [];
@@ -232,6 +234,58 @@ class AttractionController
         $response_data = json_encode($arr);
         $response->getBody()->write($response_data);
         return $response->withStatus(201);
+    }
+
+    // Route: /attractions/{attraction_id}/reviews
+    public function getReviews(Request $request, Response $response, array $args): Response
+    {
+        $attraction_id = $args['attraction_id'] ?? '';
+        $int_attraction_id = intval($attraction_id);
+
+        if (!ctype_digit($attraction_id) || $int_attraction_id < 1) {
+            throw new HttpUnprocessableEntityException($request, '`attraction_id` must be an integer > 0');
+        }
+
+        $restaurant = [];
+        try {
+            $attraction_model = new AttractionModel();
+            $attraction = $attraction_model->getSingleAttraction($int_attraction_id);
+           // var_dump($attraction);
+        } catch (\Throwable $th) {
+            throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
+        }
+
+        if (empty($attraction)) {
+            throw new HttpNotFoundException($request, "Attraction $attraction_id not found!");
+        }
+
+        $client = new Client(['base_uri' => 'https://api.yelp.com/v3/businesses/']);
+
+        $api_key = APIKeys::REVIEWS;
+        $term = $attraction['name'];
+        $location = $attraction['street'];
+
+        $reviews = [];
+        try {
+            $headers = [
+                'Authorization' => 'Bearer ' . $api_key       
+            ];
+            $res = $client->get("search?term=$term&location=$location", ['headers' => $headers]);
+            $body = json_decode($res->getBody());
+            $id = $body->businesses[0]->id;
+            $res = $client->get("$id/reviews", ['headers' => $headers]);
+            $reviews = json_decode($res->getBody());
+        } catch (\Throwable $th) {
+            throw new HttpInternalServerErrorException($request, $th);
+        }
+
+        $response_body = [
+            'term' => $term,
+            'location' => $location,
+            'reviews' => $reviews
+        ];
+        $response->getBody()->write(json_encode($response_body));
+        return $response;
     }
 
    
