@@ -15,6 +15,9 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use app\exceptions\HttpNotAcceptableException;
+use app\exceptions\HttpUnprocessableEntityException;
+use app\exceptions\HttpUnsupportedMediaTypeException;
+use Slim\Exception\HttpInternalServerErrorException;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -27,6 +30,8 @@ $app->addRoutingMiddleware();
 
 // Middleware that checks if Accept Header is Any or application/json,
 // If not, throw exception
+// Checks if Content-Type is blank or application/json,
+// If not, throw exception
 // Forces also the response to be Content-Type: application/json
 $app->add(function (Request $req, RequestHandler $handler) {
     $accept = $req->getHeader('accept')[0];
@@ -34,6 +39,21 @@ $app->add(function (Request $req, RequestHandler $handler) {
     // IF accept header is not application/json and not any
     if (strpos($accept, 'application/json') === false && strpos($accept, '*/*') === false) {
         throw new HttpNotAcceptableException($req, "Cannot handle Accept Header: $accept");
+    }
+
+    $content_type = $req->getHeader('content-type')[0] ?? false;
+
+    // If content-type is neither undefined nor application/json
+    if ($content_type !== false && strpos($content_type, 'application/json') === false) {
+        throw new HttpUnsupportedMediaTypeException($req, "Cannot handle Content-Type Header: $content_type");
+    }
+
+    $body = json_decode($req->getBody(), true);
+    $method = $req->getMethod();
+
+    // If Method is PUT or POST and the body is empty/invalid json
+    if (in_array($method, ['PUT', 'POST']) && !$body) {
+        throw new HttpUnprocessableEntityException($req, 'Request body must be a valid JSON object');
     }
 
     $res = $handler->handle($req);
