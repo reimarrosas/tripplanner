@@ -114,11 +114,10 @@ class HotelModel extends BaseModel {
         $query = <<< EOD
             SELECT h.*
             FROM
-                hotel AS h JOIN (
-                    SELECT th.hotel_id, t.tag_name
-                    FROM tagged_hotel AS th JOIN tags AS t ON th.tag_id = t.tag_id
-                    WHERE t.tag_name in ($placeholders)
-                ) as tt ON h.hotel_id = tt.hotel_id
+                hotel AS h
+                JOIN tagged_hotel AS th ON h.hotel_id = th.hotel_id
+                JOIN tags AS t ON th.tag_id = t.tag_id
+            WHERE t.tag_name in ($placeholders)
             GROUP BY h.hotel_id
             HAVING count(h.hotel_id) = $count;
         EOD;

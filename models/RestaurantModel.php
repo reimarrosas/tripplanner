@@ -170,11 +170,10 @@ class RestaurantModel extends BaseModel
         $query = <<< EOD
             SELECT r.*
             FROM
-                restaurant AS r JOIN (
-                    SELECT tr.restaurant_id, t.tag_name
-                    FROM tagged_restaurant AS tr JOIN tags AS t ON tr.tag_id = t.tag_id
-                    WHERE t.tag_name in ($placeholders)
-                ) as tt ON r.restaurant_id = tt.restaurant_id
+                restaurant AS r
+                JOIN tagged_restaurant AS tr ON r.restaurant_id = tr.restaurant_id
+                JOIN tags AS t ON tr.tag_id = t.tag_id
+            WHERE t.tag_name in ($placeholders)
             GROUP BY r.restaurant_id
             HAVING count(r.restaurant_id) = $count;
         EOD;

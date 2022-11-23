@@ -107,11 +107,10 @@ class AttractionModel extends BaseModel {
         $query = <<< EOD
             SELECT a.*
             FROM
-                attraction AS a JOIN (
-                    SELECT ta.attraction_id, t.tag_name
-                    FROM tagged_attraction AS ta JOIN tags AS t ON ta.tag_id = t.tag_id
-                    WHERE t.tag_name in ($placeholders)
-                ) as tt ON a.attraction_id = tt.attraction_id
+                attraction AS a
+                JOIN tagged_attraction AS ta ON a.attraction_id = ta.attraction_id
+                JOIN tags AS t ON ta.tag_id = t.tag_id
+            WHERE t.tag_name in ($placeholders)
             GROUP BY a.attraction_id
             HAVING count(a.attraction_id) = $count;
         EOD;
