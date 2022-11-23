@@ -94,6 +94,7 @@ $app->get('/attractions/{attraction_id}', [AttractionController::class, 'getAttr
 $app->delete('/attractions/{attraction_id}', [AttractionController::class, 'deleteAttraction']);
 $app->post('/attractions', [AttractionController::class, 'createAttraction']);
 $app->put('/attractions', [AttractionController::class, 'updateAttraction']);
+$app->get('/attractions/{attraction_id}/reviews', [AttractionController::class, 'getReviews']);
 // Car Rentals routes
 $app->get('/carrentals', [CarRentalController::class, 'getCarRentals']);
 $app->get('/carrentals/{car_rental_id}', [CarRentalController::class, 'getCarRental']);

@@ -33,7 +33,7 @@ class HotelController
     {
         $hotel_id = intval($args['hotel_id']);
         if ($hotel_id < 1) {
-            throw new HttpUnprocessableEntity($request, 'Hotel ID is not valid!');
+            throw new HttpUnprocessableEntityException($request, 'Hotel ID is not valid!');
         }
 
         $result = [];
@@ -57,7 +57,7 @@ class HotelController
     {
         $hotel_id = intval($args['hotel_id']);
         if ($hotel_id < 1) {
-            throw new HttpUnprocessableEntity($request, 'Hotel ID is not valid!');
+            throw new HttpUnprocessableEntityException($request, 'Hotel ID is not valid!');
         }
 
         $result = [];
