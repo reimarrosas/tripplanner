@@ -88,6 +88,7 @@ $app->get('/hotels/{hotel_id}', [HotelController::class, 'gethotel']);
 $app->delete('/hotels/{hotel_id}', [HotelController::class, 'deleteHotel']);
 $app->post('/hotels', [HotelController::class, 'createHotel']);
 $app->put('/hotels', [HotelController::class, 'updateHotel']);
+$app->get('/hotels/{hotel_id}/reviews', [HotelController::class, 'getReviews']);
 // Attractions routes
 $app->get('/attractions', [AttractionController::class, 'getAttractions']);
 $app->get('/attractions/{attraction_id}', [AttractionController::class, 'getAttraction']);
