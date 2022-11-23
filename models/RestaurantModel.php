@@ -162,4 +162,29 @@ class RestaurantModel extends BaseModel
         $query = 'DELETE FROM restaurant WHERE restaurant_id = :restaurant_id';
         return $this->execute($query, ['restaurant_id' => $id]);
     }
+
+    public function getRestaurantRecommendations(array $filters): array
+    {
+        $placeholders = '';
+        $count = count($filters);
+        for ($i = 0; $i < $count; ++$i) {
+            if ($i == $count - 1) {
+                $placeholders .= '?';
+            } else {
+                $placeholders .= '?, ';
+            }
+        }
+        $query = <<< EOD
+            SELECT r.*
+            FROM
+                restaurant AS r
+                JOIN tagged_restaurant AS tr ON r.restaurant_id = tr.restaurant_id
+                JOIN tags AS t ON tr.tag_id = t.tag_id
+            WHERE t.tag_name in ($placeholders)
+            GROUP BY r.restaurant_id
+            HAVING count(r.restaurant_id) = $count;
+        EOD;
+
+        return $this->rows($query, $filters);
+    }
 }

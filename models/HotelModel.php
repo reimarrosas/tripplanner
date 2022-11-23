@@ -111,4 +111,29 @@ class HotelModel extends BaseModel {
         
         return $data;
     }
+
+    public function getHotelRecommendations(array $filters): array
+    {
+        $placeholders = '';
+        $count = count($filters);
+        for ($i = 0; $i < $count; ++$i) {
+            if ($i == $count - 1) {
+                $placeholders .= '?';
+            } else {
+                $placeholders .= '?, ';
+            }
+        }
+        $query = <<< EOD
+            SELECT h.*
+            FROM
+                hotel AS h
+                JOIN tagged_hotel AS th ON h.hotel_id = th.hotel_id
+                JOIN tags AS t ON th.tag_id = t.tag_id
+            WHERE t.tag_name in ($placeholders)
+            GROUP BY h.hotel_id
+            HAVING count(h.hotel_id) = $count;
+        EOD;
+
+        return $this->rows($query, $filters);
+    }
 }
