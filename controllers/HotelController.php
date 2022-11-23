@@ -9,6 +9,9 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use app\models\HotelModel;
 use Slim\Exception\HttpInternalServerErrorException;
 use Slim\Exception\HttpNotFoundException;
+use GuzzleHttp\Client;
+use app\config\APIKeys;
+
 
 class HotelController
 {
@@ -221,6 +224,58 @@ class HotelController
         $response_data = json_encode($arr);
         $response->getBody()->write($response_data);
         return $response->withStatus(201);
+    }
+
+    // Route: /hotels/{hotel_id}/reviews
+    public function getReviews(Request $request, Response $response, array $args): Response
+    {
+        $hotel_id = $args['hotel_id'] ?? '';
+        $int_hotel_id = intval($hotel_id);
+
+        if (!ctype_digit($hotel_id) || $int_hotel_id < 1) {
+            throw new HttpUnprocessableEntityException($request, '`hotel_id` must be an integer > 0');
+        }
+
+        $restaurant = [];
+        try {
+            $hotel_model = new HotelModel();
+            $hotel = $hotel_model->getSingleHotel($int_hotel_id);
+           // var_dump($attraction);
+        } catch (\Throwable $th) {
+            throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
+        }
+
+        if (empty($hotel)) {
+            throw new HttpNotFoundException($request, "Hotel $hotel_id not found!");
+        }
+
+        $client = new Client(['base_uri' => 'https://api.yelp.com/v3/businesses/']);
+
+        $api_key = APIKeys::REVIEWS;
+        $term = $hotel['name'];
+        $location = $hotel['Street'];
+
+        $reviews = [];
+        try {
+            $headers = [
+                'Authorization' => 'Bearer ' . $api_key       
+            ];
+            $res = $client->get("search?term=$term&location=$location", ['headers' => $headers]);
+            $body = json_decode($res->getBody());
+            $id = $body->businesses[0]->id;
+            $res = $client->get("$id/reviews", ['headers' => $headers]);
+            $reviews = json_decode($res->getBody());
+        } catch (\Throwable $th) {
+            throw new HttpInternalServerErrorException($request, $th);
+        }
+
+        $response_body = [
+            'term' => $term,
+            'location' => $location,
+            'reviews' => $reviews
+        ];
+        $response->getBody()->write(json_encode($response_body));
+        return $response;
     }
 
    
