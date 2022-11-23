@@ -92,4 +92,30 @@ class AttractionModel extends BaseModel {
 
         return $data;
     }
+
+    public function getAttractionRecommendations(array $filters): array
+    {
+        $placeholders = '';
+        $count = count($filters);
+        for ($i = 0; $i < $count; ++$i) {
+            if ($i == $count - 1) {
+                $placeholders .= '?';
+            } else {
+                $placeholders .= '?, ';
+            }
+        }
+        $query = <<< EOD
+            SELECT a.*
+            FROM
+                attraction AS a JOIN (
+                    SELECT ta.attraction_id, t.tag_name
+                    FROM tagged_attraction AS ta JOIN tags AS t ON ta.tag_id = t.tag_id
+                    WHERE t.tag_name in ($placeholders)
+                ) as tt ON a.attraction_id = tt.attraction_id
+            GROUP BY a.attraction_id
+            HAVING count(a.attraction_id) = $count;
+        EOD;
+
+        return $this->rows($query, $filters);
+    }
 }

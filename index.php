@@ -7,8 +7,7 @@ use app\controllers\HotelController;
 use app\controllers\AttractionController;
 use app\controllers\CarRentalController;
 use app\controllers\CarController;
-
-
+use app\controllers\RecommendationController;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 //var_dump($_SERVER["REQUEST_METHOD"]);
@@ -106,6 +105,8 @@ $app->get('/carrentals/{car_rental_id}/cars/{car_id}', [CarController::class, 'g
 $app->post('/carrentals/cars', [CarController::class, 'createCar']);
 $app->put('/carrentals/{car_rental_id}/cars/{car_id}', [CarController::class, 'updateCar']);
 $app->delete('/carrentals/{car_rental_id}/cars/{car_id}', [CarController::class, 'deleteCar']);
+// Recommendations
+$app->get('/recommendations', [RecommendationController::class, 'recommend']);
 
 // Run the app.
 $app->run();

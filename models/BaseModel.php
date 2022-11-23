@@ -76,9 +76,9 @@ class BaseModel
      * @param  string $sql       sql query
      * @param  array  $args      params
      * @param  object $fetchMode set return mode ie object or array
-     * @return object            returns multiple records
+     * @return array             returns multiple records
      */
-    protected function rows($sql, $args = [], $fetchMode = PDO::FETCH_ASSOC)
+    protected function rows($sql, $args = [], $fetchMode = PDO::FETCH_ASSOC): array
     {
         return $this->run($sql, $args)->fetchAll($fetchMode);
     }
