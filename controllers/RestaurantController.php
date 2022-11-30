@@ -13,6 +13,8 @@ use Slim\Exception\HttpNotFoundException;
 class RestaurantController
 {
     // Route: /restaurants
+    // This function fetches all restaurants 
+    // This function also implements filtering options and supports pagination
     public function getRestaurants(Request $request, Response $response, array $args): Response
     {
         $query_params = $request->getQueryParams();
@@ -241,6 +243,7 @@ class RestaurantController
     }
 
     // Route: /restaurants/{restaurant_id}/reviews
+    // This function fetches a specific restaurant and fetches its reviews 
     public function getReviews(Request $request, Response $response, array $args): Response
     {
         $restaurant_id = $args['restaurant_id'] ?? '';

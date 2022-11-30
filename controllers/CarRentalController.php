@@ -14,7 +14,8 @@ use Slim\Exception\HttpNotFoundException;
 class CarRentalController
 {
     // Route: /carrentals
-    // TODO: Pagination
+    // This function fetches all the car rentals 
+    // This function also implements filtering 
     public function getCarRentals(Request $request, Response $response, array $args): Response
     {
         $query_params = $request->getQueryParams();
@@ -30,6 +31,7 @@ class CarRentalController
     }
 
     // Route: /carrentals/{car_rental_id}
+    // This function fetches a specific car rental by id 
     public function getCarRental(Request $request, Response $response, array $args): Response
     {
         $car_rental_id = intval($args['car_rental_id']);
@@ -54,6 +56,7 @@ class CarRentalController
     }
 
     // Route: /carrentals
+    // This function creates a car rental based on the attributes specified by the user
     public function createCarRental(Request $request, Response $response, array $args): Response
     {
         $body = $request->getParsedBody();
@@ -87,15 +90,16 @@ class CarRentalController
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
 
-        if ($result !== 1) {
-            throw new HttpInternalServerErrorException($request, 'Car Rental creation unsuccessful!');
-        }
+        // if ($result !== 1) {
+        //     throw new HttpInternalServerErrorException($request, 'Car Rental creation unsuccessful!');
+        // }
 
         $response->getBody()->write(json_encode(['message' => 'Car Rental creation successful!']));
         return $response->withStatus(201);
     }
 
     // Route: /carrentals/{car_rental_id}
+    // This function updates the attributes of an existing car rental by the attributes specified by the user
     public function updateCarRental(Request $request, Response $response, array $args): Response
     {
         $id = $args['car_rental_id'] ?? false;
@@ -131,6 +135,7 @@ class CarRentalController
     }
 
     // Route: /carrentals/{car_rental_id}
+    // This function deletes a specific car rental
     public function deleteCarRental(Request $request, Response $response, $args): Response
     {
         $id = $args['car_rental_id'] ?? false;
@@ -155,6 +160,7 @@ class CarRentalController
         return $response;
     }
 
+    // This function parses car filters specified by the user 
     private function parseCarRentalFilters(array $query_params): array
     {
         $price_max = $query_params['price_max'] ?? false;
@@ -171,6 +177,7 @@ class CarRentalController
         return $ret;
     }
 
+    // This function validates the car rental attributes specified by a user 
     private function validateCarRental(mixed $body): string
     {
         if (!is_array($body)) {
@@ -196,6 +203,7 @@ class CarRentalController
         return $ret;
     }
 
+    // This function associates the request body's car rental attributes to their corresponding variables in this file
     private function remapBody(array $body): array
     {
         return [
@@ -205,10 +213,5 @@ class CarRentalController
             'street' => $body['street'],
             'price_max' => $body['price_max']
         ];
-    }
-
-    private function validateDate($date, $format = 'Y-m-d'){
-        $d = DateTime::createFromFormat($format, $date);
-        return $d && $d->format($format) === $date;
     }
 }

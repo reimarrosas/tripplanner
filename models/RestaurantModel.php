@@ -41,6 +41,7 @@ class RestaurantModel extends BaseModel
         return $this->fetchSingle($query, ['restaurant_id' => $id]);
     }
 
+    // This function executes the sql statements to fetch a specific restaurant and its location
     public function getRestaurantLocation(int $id): array
     {
         $sql = "SELECT restaurant.*, location.* FROM restaurant JOIN location ON location.location_id=restaurant.location_fk WHERE restaurant_id = ? ";
@@ -163,6 +164,7 @@ class RestaurantModel extends BaseModel
         return $this->execute($query, ['restaurant_id' => $id]);
     }
 
+    // This function executes the SQL statements to fetch recommended restaurants based on the specified theme tag 
     public function getRestaurantRecommendations(array $filters): array
     {
         $placeholders = '';

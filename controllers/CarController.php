@@ -14,7 +14,8 @@ use Slim\Exception\HttpNotFoundException;
 class CarController
 {
     // Route: /carrentals/{car_rental_id}/cars
-    // TODO: Pagination
+    // This function fetches all the cars from a specific car rental 
+    // This function also supports pagination
     public function getCars(Request $request, Response $response, array $args): Response
     {
         $car_rental_id = $args['car_rental_id'] ?? '';
@@ -46,6 +47,7 @@ class CarController
     }
 
     // Route: /carrentals/{car_rental_id}/cars/{car_id}
+    // This function fetches a specific car from a specific car rental 
     public function getCar(Request $request, Response $response, array $args): Response
     {
         $car_rental_id = $args['car_rental_id'] ?? '';
@@ -79,6 +81,7 @@ class CarController
     }
 
     // Route: /carrentals/cars
+    // This function creates a car based on the attributes specified by the user
     public function createCar(Request $request, Response $response, array $args): Response
     {
         $body = $request->getParsedBody();
@@ -114,15 +117,16 @@ class CarController
             throw new HttpInternalServerErrorException($request, 'Something broke!', $th);
         }
 
-        if ($result !== 1) {
-            throw new HttpInternalServerErrorException($request, 'Car creation unsuccessful!');
-        }
+        // if ($result !== 1) {
+        //     throw new HttpInternalServerErrorException($request, 'Car creation unsuccessful!');
+        // }
 
         $response->getBody()->write(json_encode(['message' => 'Car creation successful!']));
         return $response->withStatus(201);
     }
 
     // Route: /carrentals/{car_rental_id}/cars/{car_id}
+    // This function updates the attributes of an existing car by the attributes specified by the user in a specific car rental
     public function updateCar(Request $request, Response $response, array $args): Response
     {
         $id = $args['car_id'] ?? false;
@@ -162,6 +166,7 @@ class CarController
     }
 
     // Route: /carrentals/{car_rental_id}/car/{car_id}
+    // This function deletes a specific car from a specific car rental
     public function deleteCar(Request $request, Response $response, $args): Response
     {
         $id = $args['car_rental_id'] ?? false;
@@ -190,6 +195,7 @@ class CarController
         return $response;
     }
 
+    // This function validates the car attributes specified by a user 
     private function validateCar(mixed $body): string
     {
         if (!is_array($body)) {
@@ -219,6 +225,7 @@ class CarController
         return $ret;
     }
 
+    // This function associates the request body's car attributes to their corresponding variables in this file
     private function remapBody(array $body): array
     {
         return [
