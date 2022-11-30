@@ -12,6 +12,7 @@ class CarRentalModel extends BaseModel
     }
 
     // Getting all car rentals
+     // This function executes the sql statements to fetch all the car rentals 
     public function getAllCarRentals(): array
     {
         $query = 'SELECT * FROM car_rental';
@@ -19,6 +20,7 @@ class CarRentalModel extends BaseModel
     }
 
     // Getting a car rental by id
+    // This function executes the sql statements to fetch a specific car rental 
     public function getCarRentalById(int $car_rental_id): array
     {
         $query = 'SELECT * FROM car_rental WHERE car_rental_id = :car_rental_id';
@@ -26,6 +28,7 @@ class CarRentalModel extends BaseModel
     }
 
     // Creating a car rental
+    // This function executes the sql statements to create a car rental based on specific car rental attributes specified by the user
     public function createCarRental($data)
     {
         $data = $this->insert("car_rental", $data);
@@ -33,6 +36,7 @@ class CarRentalModel extends BaseModel
     }
 
     // Updating car rental 
+    // This function executes the sql statements to update an existing car rental based on car rental attributes specified by the user
     public function updateCarRental(int $car_rental_id, array $car_rental): int
     {
         $car_rental['car_rental_id'] = $car_rental_id;
@@ -48,6 +52,7 @@ class CarRentalModel extends BaseModel
     }
 
     // Deleting car rental
+    // This function executes the sql statements to delete an existing car rental 
     public function deleteCarRental(int $car_rental_id): int
     {
         $query = 'DELETE FROM car_rental WHERE car_rental_id = :car_rental_id';
