@@ -15,7 +15,10 @@ use Slim\Exception\HttpNotFoundException;
 class LocationController
 {
     // Route: /locations
-    // TODO: Pagination
+    /**
+     * This method gets all of the location
+     * This method filters by country or city or both of them at the same time
+     */
     public function getLocations(Request $request, Response $response, array $args): Response
     {
         $query_params = $request->getQueryParams(); 
@@ -40,6 +43,9 @@ class LocationController
     }
 
     // Route: /locations/{location_id}
+    /**
+     * This method gets a specific location
+     */
     public function getLocation(Request $request, Response $response, array $args): Response
     {
         $location_id = intval($args['location_id']);
@@ -64,6 +70,9 @@ class LocationController
     }
 
     // Route: /locations/{location_id}
+    /**
+     * This method deletes a specific location
+     */
     public function deleteLocation(Request $request, Response $response, array $args): Response
     {
         $location_id = intval($args['location_id']);
@@ -88,6 +97,9 @@ class LocationController
     }
 
     // Route: /locations
+    /**
+     * This method can update ine or multiple locations
+     */
     function updateLocation(Request $request, Response $response, array $args) {
         $location_model = new LocationModel();
         $data = $request->getParsedBody();
@@ -123,6 +135,9 @@ class LocationController
     }
    
     // Route: /locations
+    /**
+     * This funtion creates one or multiple locations
+     */
     function createLocation(Request $request, Response $response, array $args) {
         $location_model = new LocationModel();
         $parsed_data = $request->getParsedBody();
@@ -166,6 +181,9 @@ class LocationController
     }
 
     // Route: /locations/{location_id}/climate
+    /**
+     * This function returns a specific location with it's weather from the API
+     */
     public function getClimate(Request $request, Response $response, array $args): Response
     {
         $location_id = $args['location_id'] ?? '';
@@ -188,7 +206,6 @@ class LocationController
         }
 
         $client = new Client(['base_uri' => 'http://dataservice.accuweather.com']);
-
         $api_key = APIKeys::WEATHER;
         $country = $location['country'];
         $city = $location['city'];
@@ -212,6 +229,10 @@ class LocationController
         return $response;
     }
 
+    /**
+     * This method gets the data returned fron the query, validates it to make sure it is not empty
+     * and return it as a string
+     */
     private function parseLocationFilters(array $query_params): array
     {
         $country = $query_params['country'] ?? false;

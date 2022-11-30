@@ -112,6 +112,9 @@ class HotelModel extends BaseModel {
         return $data;
     }
 
+    /**
+     * This function fetches recommended hotel based on the specific theme
+     */
     public function getHotelRecommendations(array $filters): array
     {
         $placeholders = '';

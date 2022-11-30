@@ -15,7 +15,11 @@ use app\config\APIKeys;
 class AttractionController
 {
     // Route: /attractions
-    // TODO: Pagination
+    /**
+     * This function gets all the attrations
+     * This function filters the data based on price min, price max, charging stations and parking
+     * This function supports pagination
+     */
     public function getAttractions(Request $request, Response $response, array $args): Response
     {
         $query_params = $request->getQueryParams();
@@ -40,6 +44,9 @@ class AttractionController
     }
 
     // Route: /attractions/{attraction_id}
+    /**
+     * This function gets data from a specific Attraction
+     */
     public function getAttraction(Request $request, Response $response, array $args): Response
     {
         $attraction_id = intval($args['attraction_id']);
@@ -64,6 +71,9 @@ class AttractionController
     }
 
     // Route: /attractions/{attraction_id}
+    /**
+     * This function deletes a specific Attraction
+     */
     public function deleteAttraction(Request $request, Response $response, array $args): Response
     {
         $attraction_id = intval($args['attraction_id']);
@@ -88,6 +98,9 @@ class AttractionController
     }
 
     // Route: /attractions
+    /**
+     * This function can update ine or multiple Attractions 
+     */
     function updateAttraction(Request $request, Response $response, array $args) {
         $attraction_model = new AttractionModel();
         $data = $request->getParsedBody();
@@ -155,6 +168,9 @@ class AttractionController
     }
    
     // Route: /attractions
+    /**
+     * This function creates one or multiple Attrations
+     */
     function createAttraction(Request $request, Response $response, array $args) {
         $attraction_model = new AttractionModel();
         $parsed_data = $request->getParsedBody();
@@ -237,6 +253,9 @@ class AttractionController
     }
 
     // Route: /attractions/{attraction_id}/reviews
+    /**
+     * This function returns a specific Attraction and fetches its reviews
+     */
     public function getReviews(Request $request, Response $response, array $args): Response
     {
         $attraction_id = $args['attraction_id'] ?? '';
@@ -287,7 +306,9 @@ class AttractionController
         return $response;
     }
 
-   
+    /**
+     * This function parses the data returned from the query
+     */
     private function parseAttractionFilters(array $query_params): array
     {
         $name = $query_params['name'] ?? false;
@@ -296,8 +317,8 @@ class AttractionController
         $price_min = $query_params['price_min'] ?? false;
         $price_max = $query_params['price_max'] ?? false;
         $parking = $query_params['parking'] ?? false;
-
         $ret = [];
+
         if ($name !== false) {
             $ret['name'] = "%$name%";
         }

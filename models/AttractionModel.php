@@ -105,6 +105,9 @@ class AttractionModel extends BaseModel {
         return $data;
     }
 
+    /**
+     * This function fetches recommended Attraction based on the specific theme
+     */
     public function getAttractionRecommendations(array $filters): array
     {
         $placeholders = '';
