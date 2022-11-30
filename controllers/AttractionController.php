@@ -108,6 +108,10 @@ class AttractionController
     
         for ($i = 0; $i < count($data); $i++) {
             $single_attraction = $data[$i];
+            if (empty($single_attraction))
+            {
+                throw new HttpUnprocessableEntityException($request, "Your data is empty");
+            }
             $attraction_id = $single_attraction["attraction_id"];
             $name = $single_attraction["name"];
             $charging_station = $single_attraction["charging_station"];
@@ -187,7 +191,10 @@ class AttractionController
 
         for ($i = 0; $i < count($parsed_data); $i++) {
             $single_attraction = $parsed_data[$i];
-    
+            if (empty($single_attraction))
+            {
+                throw new HttpUnprocessableEntityException($request, "Your data is empty");
+            }
             $attraction_id = $single_attraction["attraction_id"];
             $name = $single_attraction["name"];
             $charging_station = $single_attraction["charging_station"];

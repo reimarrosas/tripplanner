@@ -98,6 +98,10 @@ class HotelController
     
         for ($i = 0; $i < count($data); $i++) {
             $single_hotel = $data[$i];
+            if (empty($single_hotel))
+            {
+                throw new HttpUnprocessableEntityException($request, "Your data is empty");
+            }
             $hotel_id = $single_hotel["hotel_id"];
             $name = $single_hotel["name"];
             $charging_station = $single_hotel["charging_station"];
@@ -177,6 +181,10 @@ class HotelController
 
         for ($i = 0; $i < count($parsed_data); $i++) {
             $single_hotel = $parsed_data[$i];
+            if (empty($single_hotel))
+            {
+                throw new HttpUnprocessableEntityException($request, "Your data is empty");
+            }
             $hotel_id = $single_hotel["hotel_id"];
             $location_fk = $single_hotel["location_fk"];
             $name =  $single_hotel["name"];

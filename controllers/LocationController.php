@@ -107,6 +107,10 @@ class LocationController
     
         for ($i = 0; $i < count($data); $i++) {
             $single_location = $data[$i];
+            if (empty($single_location))
+            {
+                throw new HttpUnprocessableEntityException($request, "Your data is empty");
+            }
             $location_id = $single_location["location_id"];
             $country = $single_location["country"];
             $city = $single_location["city"];
@@ -149,7 +153,10 @@ class LocationController
 
         for ($i = 0; $i < count($parsed_data); $i++) {
             $single_location = $parsed_data[$i];
-    
+            if (empty($single_location))
+            {
+                throw new HttpUnprocessableEntityException($request, "Your data is empty");
+            }
             $location_id = $single_location["location_id"];
             $country = $single_location["country"];
             $city = $single_location["city"];
