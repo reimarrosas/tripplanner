@@ -16,7 +16,10 @@ use app\config\APIKeys;
 class HotelController
 {
     // Route: /hotels
-    // TODO: Pagination
+    /**
+     * This function returns all the hotels 
+     * This function filters the data based on price min, price max, charging stations and accessibility
+     */
     public function getHotels(Request $request, Response $response, array $args): Response
     {
         $query_params = $request->getQueryParams();
@@ -32,6 +35,9 @@ class HotelController
     }
 
     // Route: /hotels/{hotal_id}
+    /**
+     * This function returns a specific hotel
+     */
     public function getHotel(Request $request, Response $response, array $args): Response
     {
         $hotel_id = intval($args['hotel_id']);
@@ -56,6 +62,9 @@ class HotelController
     }
 
     // Route: /hotels/{hotal_id}
+    /**
+     * This function deletes a specific hotel
+     */
     public function deleteHotel(Request $request, Response $response, array $args): Response
     {
         $hotel_id = intval($args['hotel_id']);
@@ -79,6 +88,9 @@ class HotelController
     }
 
     // Route: /hotels
+    /**
+     * This function can update one or multiple hotels
+     */
     function updateHotel(Request $request, Response $response, array $args) {
         $hotel_model = new HotelModel();
         $data = $request->getParsedBody();
@@ -143,10 +155,12 @@ class HotelController
         $response_data = json_encode($arr);
         $response->getBody()->write($response_data);
         return $response;
-       // return $response;
     }
    
     // Route: /hotels
+    /**
+     * This function creates one or multiple hotels
+     */
     function createHotel(Request $request, Response $response, array $args) {
         $hotel_model = new HotelModel();
         $parsed_data = $request->getParsedBody();
@@ -227,6 +241,9 @@ class HotelController
     }
 
     // Route: /hotels/{hotel_id}/reviews
+    /**
+     * The function fetches a specific hotel and it's reviews
+     */
     public function getReviews(Request $request, Response $response, array $args): Response
     {
         $hotel_id = $args['hotel_id'] ?? '';
@@ -277,7 +294,9 @@ class HotelController
         return $response;
     }
 
-   
+   /**
+    * This function parses the data from the query
+    */
     private function parseHotelFilters(array $query_params): array
     {
         $name = $query_params['name'] ?? false;
