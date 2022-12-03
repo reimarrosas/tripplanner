@@ -401,7 +401,7 @@ CREATE TABLE `user` (
   `user_id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `permission` enum('admin','','','') NOT NULL
+  `permission` enum('admin','user') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -409,7 +409,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `username`, `password`, `permission`) VALUES
-(1, 'admin', 'admin', 'admin');
+(1, 'admin', '$2a$10$P2Qv.SWBkBvIvTd2v3MKW.jWicA4NRaEflrqEAQ5GlvanG97Hxkoa', 'admin');
 
 --
 -- Indexes for dumped tables
