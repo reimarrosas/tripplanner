@@ -17,6 +17,11 @@ use Slim\Exception\HttpUnauthorizedException;
 class AuthController
 {
     // Route: /login
+    /**
+     * Login route for authentication
+     * 
+     * Handles the creation of the authentication token based on if the user gives valid credentials
+     */
     public function login(Request $request, Response $response, array $args): Response
     {
         $body = $request->getParsedBody();
@@ -52,6 +57,12 @@ class AuthController
     }
 
     // Route: /register
+    /**
+     * Register route for authentication
+     * 
+     * Handles the creation of user for use in logging in.
+     * Can create a normal user or an admin user based on if an admin auth token is passed
+     */
     public function register(Request $request, Response $response, array $args): Response
     {
         $body = $request->getParsedBody();

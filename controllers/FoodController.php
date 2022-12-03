@@ -13,6 +13,9 @@ use Slim\Exception\HttpNotFoundException;
 class FoodController
 {
     // Route: /restaurants/{restaurant_id}/food
+    /**
+     * Handles the fetching of all food of a specific restaurant
+     */
     public function getAllFood(Request $request, Response $response, $args): Response
     {
         $restaurant_id = $args['restaurant_id'] ?? '';
@@ -34,6 +37,9 @@ class FoodController
     }
 
     // Route: /restaurants/{restaurant_id}/food/{food_id}
+    /**
+     * Handles the fetching of a single food of a specific restaurant
+     */
     public function getSingleFood(Request $request, Response $response, $args): Response
     {
         $restaurant_id = $args['restaurant_id'] ?? '';
@@ -67,6 +73,9 @@ class FoodController
     }
 
     // Route: /restaurants/{restaurant_id}/food
+    /**
+     * Handles the creation of food on a specific restaurant
+     */
     public function createFood(Request $request, Response $response, $args): Response
     {
         $restaurant_id = intval($args['restaurant_id'] ?? '');
@@ -122,6 +131,9 @@ class FoodController
     }
 
     // Route: /restaurants/{restaurant_id}/food/{food_id}
+    /**
+     * Handles the update of a specific food of a specific restaurant
+     */
     public function updateFood(Request $request, Response $response, $args): Response
     {
         $restaurant_id = intval($args['restaurant_id'] ?? '');
@@ -177,6 +189,9 @@ class FoodController
     }
 
     // Route: /restaurants/{restaurant_id}/food/{food_id}
+    /**
+     * Handles the deletion of food of a specific restaurant
+     */
     public function deleteFood(Request $request, Response $response, $args): Response
     {
         $restaurant_id = $args['restaurant_id'] ?? '';
@@ -209,6 +224,9 @@ class FoodController
         return $response;
     }
 
+    /**
+     * Helper method for validating the route parameters passed for specifying a food
+     */
     private function validateFoodParams(array $food_params): string
     {
         $ret = '';
@@ -222,6 +240,9 @@ class FoodController
         return $ret;
     }
 
+    /**
+     * Helper method for validating if body passed on food creation
+     */
     private function validateFood(mixed $food): string
     {
         if (!is_array($food)) {
@@ -245,6 +266,9 @@ class FoodController
         return $ret;
     }
 
+    /**
+     * Helper method for trimming the request body to remove unnecessary properties
+     */
     private function remapBody(array $food): array
     {
         return [
@@ -255,6 +279,9 @@ class FoodController
         ];
     }
 
+    /**
+     * Helper method for validating the request body for updating a specific food
+     */
     private function validateUpdateFood(mixed $food): string
     {
         $ret = $this->validateFood($food);
@@ -268,6 +295,10 @@ class FoodController
         return $ret;
     }
 
+    /**
+     * Helper method for trimming the request body in update route
+     * to remove unnnecessary properties
+     */
     private function remapUpdateBody(array $food): array
     {
         return [
