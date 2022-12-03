@@ -39,6 +39,9 @@ class RestaurantController
     }
 
     // Route: /restaurants/{restaurant_id}
+    /**
+     * this function can gets a single restaurant
+     */
     public function getRestaurant(Request $request, Response $response, array $args): Response
     {
         $restaurant_id = intval($args['restaurant_id']);
@@ -63,6 +66,9 @@ class RestaurantController
     }
 
     // Route: /restaurants
+    /**
+     * This function creates one or multiple restaurants
+     */
     public function createRestaurant(Request $request, Response $response, array $args): Response
     {
         $body = $request->getParsedBody();
@@ -100,6 +106,9 @@ class RestaurantController
     }
 
     // Route: /restaurants
+    /**
+     * This function update one or multiple restaurants
+     */
     public function updateRestaurant(Request $request, Response $response, array $args): Response
     {
         $body = $request->getParsedBody();
@@ -148,6 +157,9 @@ class RestaurantController
     }
 
     // Route: /restaurants/{restaurant_id}
+    /**
+     * This function delete one restaurant
+     */
     public function deleteRestaurant(Request $request, Response $response, $args): Response
     {
         $id = $args['restaurant_id'] ?? false;
@@ -172,6 +184,9 @@ class RestaurantController
         return $response;
     }
 
+    /**
+     * this function checks the validation of the data return fromt the query
+     */
     private function parseRestaurantFilters(array $query_params): array
     {
         $name = $query_params['name'] ?? false;
@@ -200,6 +215,9 @@ class RestaurantController
         return $ret;
     }
 
+    /**
+     * This function validates the data
+     */
     private function validateRestaurant(mixed $body): string
     {
         if (!is_array($body)) {
@@ -229,6 +247,9 @@ class RestaurantController
         return $ret;
     }
 
+    /**
+     * Converts the data from the body to variables in the code
+     */
     private function remapBody(array $body): array
     {
         return [
@@ -263,7 +284,7 @@ class RestaurantController
         if (empty($restaurant)) {
             throw new HttpNotFoundException($request, "Restaurant $restaurant_id not found!");
         }
-
+        
         $client = new Client(['base_uri' => 'https://api.yelp.com/v3/businesses/']);
 
         $api_key = APIKeys::REVIEWS;
