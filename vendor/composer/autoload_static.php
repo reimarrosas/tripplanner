@@ -42,6 +42,7 @@ class ComposerStaticInit556b64f54c1bb1d93e7ab5058bc08177
         ),
         'F' => 
         array (
+            'Firebase\\JWT\\' => 13,
             'Fig\\Http\\Message\\' => 17,
             'FastRoute\\' => 10,
         ),
@@ -97,6 +98,10 @@ class ComposerStaticInit556b64f54c1bb1d93e7ab5058bc08177
         'GuzzleHttp\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
+        ),
+        'Firebase\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
         'Fig\\Http\\Message\\' => 
         array (

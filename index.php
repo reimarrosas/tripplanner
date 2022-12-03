@@ -1,10 +1,12 @@
 <?php
 
+use app\config\APIKeys;
 use app\controllers\FoodController;
 use app\controllers\RestaurantController;
 use app\controllers\LocationController;
 use app\controllers\HotelController;
 use app\controllers\AttractionController;
+use app\controllers\AuthController;
 use app\controllers\CarRentalController;
 use app\controllers\CarController;
 use app\controllers\RecommendationController;
@@ -16,7 +18,13 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use app\exceptions\HttpNotAcceptableException;
 use app\exceptions\HttpUnprocessableEntityException;
 use app\exceptions\HttpUnsupportedMediaTypeException;
-use Slim\Exception\HttpInternalServerErrorException;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Firebase\JWT\SignatureInvalidException;
+use Slim\Exception\HttpForbiddenException;
+use Slim\Exception\HttpUnauthorizedException;
+use Slim\Routing\RouteContext;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -55,9 +63,51 @@ $app->add(function (Request $req, RequestHandler $handler) {
         throw new HttpUnprocessableEntityException($req, 'Request body must be a valid JSON object');
     }
 
-    $res = $handler->handle($req);
+    return $handler->handle($req);
+});
 
-    return $res->withAddedHeader('Content-Type', 'application/json');
+/**
+ * Authorization middleware
+ * 
+ * Checks if the token is valid and if the token claim is sufficient for the operation
+ */
+$app->add(function (Request $request, RequestHandler $handler) {
+    $uri = $request->getUri();
+    $method = $request->getMethod();
+
+    if (strpos($uri, 'register') !== false || strpos($uri, 'login') !== false) {
+        return $handler->handle($request);
+    }
+
+    $token = $request->getHeader('Authorization')[0] ?? '';
+    $parsed_token = explode(' ', $token)[1] ?? '';
+
+    if ($parsed_token === '') {
+        throw new HttpUnprocessableEntityException($request, 'Malformed Authorization token!');
+    }
+
+    try {
+        $decoded_token = (array) JWT::decode($parsed_token, new Key(APIKeys::SECRET, 'HS256'));
+    } catch (ExpiredException | SignatureInvalidException $e) {
+        throw new HttpUnauthorizedException($request, 'Token invalid!', $e);
+    } catch (\Throwable $e) {
+        throw new HttpUnprocessableEntityException($request, 'Cannot parse token!', $e);
+    }
+
+    if (in_array($method, ['POST', 'PUT', 'DELETE'])) {
+        var_dump($decoded_token);
+        $role = $decoded_token['role'] ?? '';
+        if ($role != 'admin') {
+            throw new HttpForbiddenException($request, 'Insufficient permission!');
+        }
+    }
+
+    return $handler->handle($request);
+});
+
+// Middleware that sets Content-Type to JSON
+$app->add(function (Request $request, RequestHandler $handler) {
+    return $handler->handle($request)->withHeader('Content-Type', 'application/json;charset=utf-8');
 });
 
 //-- Step 3) Add error handling middleware.
@@ -130,6 +180,9 @@ $app->delete('/carrentals/{car_rental_id}/cars/{car_id}', [CarController::class,
 // Recommendations
 $app->get('/recommendations', [RecommendationController::class, 'recommend']);
 $app->get('/recommendations/tags', [RecommendationController::class, 'getRecommendationTags']);
+// Auth
+$app->post('/login', [AuthController::class, 'login']);
+$app->post('/register', [AuthController::class, 'register']);
 
 // Run the app.
 $app->run();

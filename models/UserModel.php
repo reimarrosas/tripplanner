@@ -16,6 +16,12 @@ class UserModel extends BaseModel
         return $this->fetchAll($query);
     }
 
+    public function getUserByUsername(string $username): array
+    {
+        $query = 'SELECT * FROM user WHERE username = :username';
+        return $this->fetchSingle($query, ['username' => $username]);
+    }
+
     // Getting a user by id 
     public function getUserById(int $user_id): array
     {
