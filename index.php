@@ -1,6 +1,5 @@
 <?php
 
-use app\config\APIKeys;
 use app\controllers\FoodController;
 use app\controllers\RestaurantController;
 use app\controllers\LocationController;
@@ -10,21 +9,25 @@ use app\controllers\AuthController;
 use app\controllers\CarRentalController;
 use app\controllers\CarController;
 use app\controllers\RecommendationController;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-//var_dump($_SERVER["REQUEST_METHOD"]);
-use Slim\Factory\AppFactory;
-use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
+
 use app\exceptions\HttpNotAcceptableException;
 use app\exceptions\HttpUnprocessableEntityException;
 use app\exceptions\HttpUnsupportedMediaTypeException;
+
+use app\config\APIKeys;
+
+use Slim\Factory\AppFactory;
+use Slim\Exception\HttpForbiddenException;
+use Slim\Exception\HttpUnauthorizedException;
+
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
+
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\SignatureInvalidException;
-use Slim\Exception\HttpForbiddenException;
-use Slim\Exception\HttpUnauthorizedException;
-use Slim\Routing\RouteContext;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -126,6 +129,26 @@ $app->setBasePath("/tripplanner");
 // Define app routes.
 $app->get('/hello', function (Request $request, Response $response, $args) {
     $response->getBody()->write(json_encode(["message" => "Hello, World!"]));
+    return $response;
+});
+
+$app->get('/', function (Request $request, Response $response, array $args) {
+    $base_route = 'http://localhost/tripplanner';
+
+    $response->getBody()->write(json_encode([
+        'attractions' => "$base_route/attractions",
+        'cars' => "$base_route/carrentals/cars",
+        'carrentals' => "$base_route/carrentals",
+        'food' => "$base_route/restaurants/food",
+        'hotels' => "$base_route/hotels",
+        'locations' => "$base_route/locations",
+        'restaurants' => "$base_route/restaurants",
+        'recommendations' => "$base_route/recommendations",
+        'climate' => "$base_route/locations/climate",
+        'attraction_reviews' => "$base_route/attractions/reviews",
+        'hotel_reviews' => "$base_route/hotels/reviews",
+        'restaurant_reviews' => "$base_route/restaurants/reviews",
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     return $response;
 });
 
