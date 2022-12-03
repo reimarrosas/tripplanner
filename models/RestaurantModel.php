@@ -9,6 +9,9 @@ class RestaurantModel extends BaseModel
         parent::__construct();
     }
 
+    /**
+     * this function gets all the data from restaurant table
+     */
     public function getAllRestaurants(array $filters, $page_num, $page_size): array
     {
         $query = 'SELECT * FROM restaurant';
@@ -35,6 +38,9 @@ class RestaurantModel extends BaseModel
         return $this->fetchAll($query, $filters);
     }
 
+    /**
+     * Gets data of a single restaurant
+     */
     public function getSingleRestaurant(int $id): array
     {
         $query = 'SELECT * FROM restaurant WHERE restaurant_id = :restaurant_id';
@@ -49,6 +55,9 @@ class RestaurantModel extends BaseModel
         return $data;
     }
 
+    /**
+     * this function creates a single restaurant
+     */
     public function createSingleRestaurant(array $restaurant): int
     {
         $query =
@@ -59,6 +68,9 @@ class RestaurantModel extends BaseModel
         return $this->execute($query, $restaurant);
     }
 
+    /**
+     * This function creates multiple restaurants
+     */
     public function createMultipleRestaurant(array $restaurants): int
     {
         $count = 0;
@@ -98,6 +110,9 @@ class RestaurantModel extends BaseModel
         return $count;
     }
 
+    /**
+     * This function updates a single restaurant
+     */
     public function updateSingleRestaurant(int $restaurant_id, array $restaurant): int
     {
         $restaurant['restaurant_id'] = $restaurant_id;
@@ -114,6 +129,9 @@ class RestaurantModel extends BaseModel
         return $this->execute($query, $restaurant);
     }
 
+    /**
+     * This function updates multiple restaurants
+     */
     public function updateMultipleRestaurant(array $restaurants): int
     {
         $count = 0;
@@ -158,6 +176,9 @@ class RestaurantModel extends BaseModel
         return $count;
     }
 
+    /**
+     * This function deletes a single restaurant
+     */
     public function deleteRestaurant(int $id): int
     {
         $query = 'DELETE FROM restaurant WHERE restaurant_id = :restaurant_id';
