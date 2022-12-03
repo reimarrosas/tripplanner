@@ -9,6 +9,9 @@ class FoodModel extends BaseModel
         parent::__construct();
     }
 
+    /**
+     * This function retrieves all the food from the databse
+     */
     public function getAllFood(int $restaurant_id): array
     {
         $query = 'SELECT * FROM FOOD WHERE restaurant_fk = :restaurant_id';
@@ -20,6 +23,9 @@ class FoodModel extends BaseModel
         return $this->fetchSingle($query, ['food_id' => $food_id, 'restaurant_fk' => $restaurant_fk]);
     }
 
+    /**
+     * This function creates a single food
+     */
     public function createSingleFood(array $food): int
     {
         $query =
@@ -30,6 +36,10 @@ class FoodModel extends BaseModel
         return $this->execute($query, $food);
     }
 
+
+    /**
+     * This function cretes multiple food from the database
+     */
     public function createMultipleFood(array $foods): int
     {
         $count = 0;
@@ -65,6 +75,9 @@ class FoodModel extends BaseModel
         return $count;
     }
 
+    /**
+     * This function updates a single food fromt the database
+     */
     public function updateSingleFood(array $food): int
     {
         $query =
@@ -77,6 +90,9 @@ class FoodModel extends BaseModel
         return $this->execute($query, $food);
     }
 
+    /**
+     * this function updates multiple food from the datatabse
+     */
     public function updateMultipleFood(array $foods): int
     {
         $count = 0;
@@ -116,6 +132,9 @@ class FoodModel extends BaseModel
         return $count;
     }
 
+    /**
+     * This function delete a single food from the database
+     */
     public function deleteFood(int $restaurant_fk, int $food_id): int
     {
         $query = 'DELETE FROM food WHERE restaurant_fk = :restaurant_fk AND food_id = :food_id';
