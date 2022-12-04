@@ -192,13 +192,13 @@ $app->get('/attractions/{attraction_id}/reviews', [AttractionController::class, 
 $app->get('/carrentals', [CarRentalController::class, 'getCarRentals']);
 $app->get('/carrentals/{car_rental_id}', [CarRentalController::class, 'getCarRental']);
 $app->post('/carrentals', [CarRentalController::class, 'createCarRental']);
-$app->put('/carrentals/{car_rental_id}', [CarRentalController::class, 'updateCarRental']);
+$app->put('/carrentals', [CarRentalController::class, 'updateCarRental']); 
 $app->delete('/carrentals/{car_rental_id}', [CarRentalController::class, 'deleteCarRental']);
 // Car routes
 $app->get('/carrentals/{car_rental_id}/cars', [CarController::class, 'getCars']);
 $app->get('/carrentals/{car_rental_id}/cars/{car_id}', [CarController::class, 'getCar']);
 $app->post('/carrentals/cars', [CarController::class, 'createCar']);
-$app->put('/carrentals/{car_rental_id}/cars/{car_id}', [CarController::class, 'updateCar']);
+$app->put('/carrentals/{car_rental_id}/cars', [CarController::class, 'updateCar']); 
 $app->delete('/carrentals/{car_rental_id}/cars/{car_id}', [CarController::class, 'deleteCar']);
 // Recommendations
 $app->get('/recommendations', [RecommendationController::class, 'recommend']);
