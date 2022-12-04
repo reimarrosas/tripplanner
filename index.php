@@ -85,20 +85,13 @@ $app->add(function (Request $request, RequestHandler $handler) {
     $token = $request->getHeader('Authorization')[0] ?? '';
     $parsed_token = explode(' ', $token)[1] ?? '';
 
-    if ($parsed_token === '') {
-        throw new HttpUnprocessableEntityException($request, 'Malformed Authorization token!');
-    }
-
     try {
         $decoded_token = (array) JWT::decode($parsed_token, new Key(APIKeys::SECRET, 'HS256'));
-    } catch (ExpiredException | SignatureInvalidException $e) {
-        throw new HttpUnauthorizedException($request, 'Token invalid!', $e);
     } catch (\Throwable $e) {
-        throw new HttpUnprocessableEntityException($request, 'Cannot parse token!', $e);
+        throw new HttpUnauthorizedException($request, 'Token invalid!', $e);
     }
 
     if (in_array($method, ['POST', 'PUT', 'DELETE'])) {
-        var_dump($decoded_token);
         $role = $decoded_token['role'] ?? '';
         if ($role != 'admin') {
             throw new HttpForbiddenException($request, 'Insufficient permission!');
