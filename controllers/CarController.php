@@ -125,17 +125,13 @@ class CarController
         return $response->withStatus(201);
     }
 
-    // Route: /carrentals/{car_rental_id}/cars/{car_id}
+    // Route: /carrentals/{car_rental_id}/cars
     // This function updates the attributes of an existing car by the attributes specified by the user in a specific car rental
     public function updateCar(Request $request, Response $response, array $args): Response
     {
-        $id = $args['car_id'] ?? false;
-        $int_id = intval($id);
         $car_rental_id = $args['car_rental_id'] ?? false;
         $int_car_rental_id = intval($car_rental_id);
-        if (!ctype_digit($id)) {
-            throw new HttpUnprocessableEntityException($request, 'Car ID invalid!');
-        } else if (!ctype_digit($car_rental_id)) {
+        if (!ctype_digit($car_rental_id)) {
             throw new HttpUnprocessableEntityException($request, 'Car Rental ID invalid!');
         }
 
@@ -147,6 +143,9 @@ class CarController
         }
 
         $body = $this->remapBody($body);
+
+        $int_id = $body['car_id'];
+
         try {
             $car_model = new CarModel();
 
@@ -229,6 +228,7 @@ class CarController
     private function remapBody(array $body): array
     {
         return [
+            'car_id' => $body['car_id'],
             'car_rental_fk' => $body['car_rental_fk'],
             'make' => $body['make'],
             'model' => $body['model'],

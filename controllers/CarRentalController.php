@@ -98,17 +98,12 @@ class CarRentalController
         return $response->withStatus(201);
     }
 
-    // Route: /carrentals/{car_rental_id}
+   // Route: /carrentals
     // This function updates the attributes of an existing car rental by the attributes specified by the user
     public function updateCarRental(Request $request, Response $response, array $args): Response
     {
-        $id = $args['car_rental_id'] ?? false;
-        $int_id = intval($id);
-        if (!ctype_digit($id)) {
-            throw new HttpUnprocessableEntityException($request, 'Car Rental ID invalid!');
-        }
-
         $body = $request->getParsedBody()[0];
+
         $validation = $this->validateCarRental($body);
 
         if (!empty($validation)) {
@@ -116,6 +111,9 @@ class CarRentalController
         }
 
         $body = $this->remapBody($body);
+
+        $int_id = $body['car_rental_id'];
+
         try {
             $carrental_model = new CarRentalModel();
 
@@ -207,6 +205,7 @@ class CarRentalController
     private function remapBody(array $body): array
     {
         return [
+            'car_rental_id' => $body['car_rental_id'],
             'location_fk' => $body['location_fk'],
             'price_min' => $body['price_min'],
             'rental_duration' => $body['rental_duration'],
